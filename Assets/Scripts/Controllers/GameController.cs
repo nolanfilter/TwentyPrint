@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Advertisements;
 using System.Collections;
 
 public class GameController : MonoBehaviour {
@@ -13,8 +14,14 @@ public class GameController : MonoBehaviour {
 
 	private float colorOffset;
 
+	private const string gameID = "32974";
+
+	private int numTimesPrinted = 0;
+
 	void Start()
 	{
+		Advertisement.Initialize( gameID, true );
+
 		deck = new int[ BoardAgent.BoardSize ];
 	}
 
@@ -32,21 +39,30 @@ public class GameController : MonoBehaviour {
 	{
 		if( isRunning )
 		{
+			return;
+
 			StopCoroutine( "DoPrint" );
 
 			int deckIndex;
 
-			for( int i = index; i < BoardAgent.BoardSize; i++ )
+			while( index < BoardAgent.BoardSize )
 			{
-				deckIndex = deck[i];
+				deckIndex = deck[index];
 				ActivateSprite( new Vector2( deckIndex % BoardAgent.BoardWidth, BoardAgent.BoardHeight - 1 - deckIndex / BoardAgent.BoardWidth ) );
 				//ActivateSprite( new Vector2( i % BoardAgent.BoardWidth, BoardAgent.BoardHeight - 1 - i / BoardAgent.BoardWidth ) );
+			
+				index++;
 			}
 
 			isRunning = false;
 		}
 		else
 		{
+			if( numTimesPrinted > 0 && Advertisement.isReady() )
+			{
+				Advertisement.Show();
+			}
+
 			BoardAgent.ResetBoard();
 			ShuffleDeck();
 			colorOffset = Random.Range( 0f, 360f );
@@ -58,6 +74,11 @@ public class GameController : MonoBehaviour {
 	private IEnumerator DoPrint()
 	{
 		isRunning = true;
+
+		while( Advertisement.isShowing )
+		{
+			yield return null;
+		}
 
 		index = 0;
 		int deckIndex;
@@ -82,6 +103,8 @@ public class GameController : MonoBehaviour {
 
 			yield return null;
 		}
+
+		numTimesPrinted++;
 
 		isRunning = false;
 	}

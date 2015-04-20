@@ -96,7 +96,7 @@ PlayerSettings:
   preloadShaders: 0
   StripUnusedMeshComponents: 0
   iPhoneSdkVersion: 988
-  iPhoneTargetOSVersion: 22
+  iPhoneTargetOSVersion: 24
   uIPrerenderedIcon: 0
   uIRequiresPersistentWiFi: 0
   uIStatusBarHidden: 1
@@ -379,8 +379,8 @@ PlayerSettings:
   WebGL::audioCompressionFormat: 4
   WebGL::exceptionSupport: 0
   WebGL::memorySize: 256
-  iOS::Architecture: 0
-  iOS::ScriptingBackend: 0
+  iOS::Architecture: 2
+  iOS::ScriptingBackend: 1
   boolPropertyNames:
   - WebGL::dataCaching
   WebGL::dataCaching: 0
