@@ -211,4 +211,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hello_texture: {fileID: 2800000, guid: e2b49e741d78f4eee986a972a02d510e, type: 3}
-  darawTexgture: {fileID: 0}
+  drawTexture: {fileID: 0}
