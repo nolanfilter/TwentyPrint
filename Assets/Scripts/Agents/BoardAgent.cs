@@ -13,7 +13,7 @@ public class BoardAgent : MonoBehaviour {
 		}
 	}
 
-	private static int mBoardHeight = 40;
+	private static int mBoardHeight = 39;
 	public static int BoardHeight
 	{
 		get
@@ -62,6 +62,8 @@ public class BoardAgent : MonoBehaviour {
 
 	void Start()
 	{
+		mBoardWidth = Mathf.CeilToInt( (float)mBoardHeight / (float)Screen.height * (float)Screen.width );
+
 		if( Screen.width > Screen.height )
 		{
 			int temp = mBoardWidth;
@@ -80,7 +82,9 @@ public class BoardAgent : MonoBehaviour {
 			CellSize = CellWidth;
 		else
 			CellSize = CellHeight;
-		
+
+		Debug.Log ( CellSize );
+
 		MarginWidth = ( Screen.width - CellSize * BoardWidth ) * 0.5f;
 		MarginHeight = ( Screen.height - CellSize * BoardHeight ) * 0.5f;
 

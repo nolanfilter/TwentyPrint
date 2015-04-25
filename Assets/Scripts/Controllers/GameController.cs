@@ -1,10 +1,14 @@
 ﻿using UnityEngine;
 using UnityEngine.Advertisements;
 using UnityEngine.iOS;
+using UnityEngine.UI;
 using System.Collections;
 using UnionAssets.FLE;
 
 public class GameController : MonoBehaviour {
+
+	public CanvasScaler canvasScaler; 
+	public RectTransform scrollPanelRectTransform;
 
 	public float speed;
 
@@ -22,7 +26,13 @@ public class GameController : MonoBehaviour {
 
 	private int numTimesPrinted = 0;
 
-	private int mode = 0;
+	private int mode = 1;
+
+	private float navigationDuration = 0.2f;
+	private float currentScreenX = 0f;
+	private float width;
+	private float dragBeginTime;
+	private Vector2 dragBeginPosition;
 
 	void Start()
 	{
@@ -34,8 +44,6 @@ public class GameController : MonoBehaviour {
 
 		Advertisement.Initialize( gameID, true );
 		Advertisement.allowPrecache = true;
-
-		iAdBanner banner = iAdBannerController.instance.CreateAdBanner( TextAnchor.LowerLeft );
 
 		UnityEngine.iOS.NotificationServices.RegisterForNotifications( NotificationType.Alert | NotificationType.Badge | NotificationType.Sound );
 
@@ -51,17 +59,26 @@ public class GameController : MonoBehaviour {
 
 		IOSNotificationController.instance.addEventListener( IOSNotificationController.DEVICE_TOKEN_RECEIVED, OnTokenReceived );
 
+		if( canvasScaler )
+			width = canvasScaler.referenceResolution.x;
+
 		deck = new int[ BoardAgent.BoardSize ];
 	}
 
 	void OnEnable()
 	{
-		FingerGestures.OnFingerDown += OnPress;
+		FingerGestures.OnFingerDown += OnTouchDown;
+		FingerGestures.OnFingerDragBegin += OnDragDown;
+		FingerGestures.OnFingerDragMove += OnDragMove;
+		FingerGestures.OnFingerDragEnd += OnDragUp;
 	}
 
 	void OnDisable()
 	{
-		FingerGestures.OnFingerDown -= OnPress;
+		FingerGestures.OnFingerDown -= OnTouchDown;
+		FingerGestures.OnFingerDragBegin -= OnDragDown;
+		FingerGestures.OnFingerDragMove -= OnDragMove;
+		FingerGestures.OnFingerDragEnd -= OnDragUp;
 	}
 
 	/*
@@ -118,7 +135,7 @@ public class GameController : MonoBehaviour {
 		IOSNotificationController.instance.removeEventListener( IOSNotificationController.DEVICE_TOKEN_RECEIVED, OnTokenReceived );
 	}
 
-	private void OnPress( int fingerIndex, Vector2 fingerPos )
+	private void OnTouchDown( int fingerIndex, Vector2 fingerPos )
 	{
 		if( isRunning )
 		{
@@ -154,6 +171,70 @@ public class GameController : MonoBehaviour {
 
 			StartCoroutine( "DoPrint" );
 		}
+	}
+
+	void OnDragDown( int fingerIndex, Vector2 fingerPos, Vector2 startPos )
+	{
+		dragBeginTime = Time.time;
+		dragBeginPosition = startPos;
+
+		StopCoroutine( "DoNavigation" );
+	}
+	
+	void OnDragMove( int fingerIndex, Vector2 fingerPos, Vector2 delta )
+	{
+		if( scrollPanelRectTransform == null )
+			return;
+
+		float absPosition = Mathf.Abs( scrollPanelRectTransform.localPosition.x + delta.x );
+
+		if( absPosition < width * 1.5f )
+			scrollPanelRectTransform.localPosition += Vector3.right * delta.x;
+	}
+	
+	void OnDragUp( int fingerIndex, Vector2 fingerPos )
+	{
+		if( scrollPanelRectTransform == null )
+			return;
+
+		if( Time.time - dragBeginTime < 0.25f )
+		{
+			if( Mathf.Abs( fingerPos.x - dragBeginPosition.x ) > Mathf.Abs( fingerPos.y - dragBeginPosition.y ) )
+				currentScreenX += width * Mathf.Sign( fingerPos.x - dragBeginPosition.x );
+		}
+		else
+		{
+			currentScreenX = Mathf.Round( scrollPanelRectTransform.localPosition.x / width ) * width;
+		}
+
+		currentScreenX = Mathf.Clamp( currentScreenX, width * -1f, width );
+		StartCoroutine( "DoNavigation", Vector3.right * currentScreenX );
+	}
+
+	private IEnumerator DoNavigation( Vector3 toPosition )
+	{
+		if( scrollPanelRectTransform == null )
+			yield break;
+
+		float beginTime = Time.time;
+		Vector3 fromPosition = scrollPanelRectTransform.localPosition;
+		float currentTime = 0f;
+		float lerp;
+
+		do
+		{
+			currentTime += Time.deltaTime;
+			lerp = Mathf.Clamp01( currentTime / navigationDuration );
+
+			lerp = 3f * Mathf.Pow( lerp, 2f ) - 2f * Mathf.Pow( lerp, 3f );
+
+			scrollPanelRectTransform.localPosition = Vector3.Lerp( fromPosition, toPosition, lerp );
+
+			yield return null;
+
+		} while( currentTime < navigationDuration );
+
+		scrollPanelRectTransform.localPosition = toPosition;
 	}
 
 	private IEnumerator DoPrint()
