@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class BoardAgent : MonoBehaviour {
 
-	private static int mBoardWidth = 25;
+	private static int mBoardWidth = 75;
 	public static int BoardWidth
 	{
 		get
@@ -13,7 +13,7 @@ public class BoardAgent : MonoBehaviour {
 		}
 	}
 
-	private static int mBoardHeight = 39;
+	private static int mBoardHeight = 40;
 	public static int BoardHeight
 	{
 		get
@@ -45,8 +45,6 @@ public class BoardAgent : MonoBehaviour {
 	public static float CellSize;
 	private static float MarginWidth;
 	private static float MarginHeight;
-	private static float MinimumMarginWidth = 0f;
-	private static float MinimumMarginHeight = 0f;
 
 	void Awake()
 	{
@@ -62,37 +60,12 @@ public class BoardAgent : MonoBehaviour {
 
 	void Start()
 	{
-		mBoardWidth = Mathf.CeilToInt( (float)mBoardHeight / (float)Screen.height * (float)Screen.width );
+		mBoardHeight = Mathf.CeilToInt( (float)( BoardWidth / 3 ) / (float)Screen.width * (float)Screen.height );
 
-		if( Screen.width > Screen.height )
-		{
-			int temp = mBoardWidth;
-			mBoardWidth = mBoardHeight;
-			mBoardHeight = temp;
-		}
-
-		//determine projection scale
-		MinimumMarginWidth = Mathf.Clamp( MinimumMarginWidth, 0f, Screen.width * 0.5f );
-		MinimumMarginHeight = Mathf.Clamp( MinimumMarginHeight, 0f, Screen.height * 0.5f );
-
-		float CellWidth = ( Screen.width - 2f * MinimumMarginWidth ) / BoardWidth;
-		float CellHeight = ( Screen.height - 2f * MinimumMarginHeight ) / BoardHeight;
-		
-		if( CellWidth < CellHeight )
-			CellSize = CellWidth;
-		else
-			CellSize = CellHeight;
-
-		Debug.Log ( CellSize );
+		CellSize = ( Screen.width ) / ( BoardWidth / 3 );
 
 		MarginWidth = ( Screen.width - CellSize * BoardWidth ) * 0.5f;
 		MarginHeight = ( Screen.height - CellSize * BoardHeight ) * 0.5f;
-
-		if( MarginWidth < MinimumMarginWidth )
-			MarginWidth = MinimumMarginWidth;
-		
-		if( MarginHeight < MinimumMarginHeight )
-			MarginHeight = MinimumMarginHeight;
 
 		BoardSprites = new SpriteRenderer[ BoardWidth, BoardHeight ];
 		GameObject go;
@@ -169,7 +142,7 @@ public class BoardAgent : MonoBehaviour {
 		if( position.x < 0 || position.x >= BoardWidth || position.y < 0 || position.y >= BoardHeight )
 			return;
 
-		BoardSprites[ (int)position.x, (int)position.y ].color = newColor;
+		BoardSprites[ (int)position.x, (int)position.y ].color = new Color( newColor.r, newColor.g, newColor.b, BoardSprites[ (int)position.x, (int)position.y ].color.a );
 	}
 
 	private SpriteRenderer MakeSpriteAt( Vector2 position )
@@ -178,6 +151,14 @@ public class BoardAgent : MonoBehaviour {
 		go.transform.position  = new Vector3( position.x, position.y, 1f );
 		go.transform.localScale = new Vector3( CellSize, CellSize, 1f );
 
-		return go.GetComponent<SpriteRenderer>();
+		SpriteRenderer spriteRenderer = go.GetComponent<SpriteRenderer>();
+
+		float alpha = 1f;
+		if( Mathf.Abs( position.x - Screen.width * 0.5f ) > Screen.width * 0.5f )
+			alpha = Mathf.Lerp( 1f, 0f, ( Mathf.Abs( position.x - Screen.width * 0.5f ) - Screen.width * 0.5f ) / Screen.width );
+					
+		spriteRenderer.color = new Color( 1f, 1f, 1f, alpha );
+
+		return spriteRenderer;
 	}
 }
