@@ -22,11 +22,21 @@ public class BoardAgent : MonoBehaviour {
 		}
 	}
 
+	private static int numScreens = 3;
+
 	public static int BoardSize
 	{
 		get
 		{
-			return mBoardWidth * mBoardHeight;
+			return ScreenWidth * mBoardHeight;
+		}
+	}
+
+	public static int ScreenWidth
+	{
+		get
+		{
+			return ( mBoardWidth / numScreens );
 		}
 	}
 
@@ -60,9 +70,9 @@ public class BoardAgent : MonoBehaviour {
 
 	void Start()
 	{
-		mBoardHeight = Mathf.CeilToInt( (float)( BoardWidth / 3 ) / (float)Screen.width * (float)Screen.height );
+		mBoardHeight = Mathf.CeilToInt( (float)( BoardWidth / numScreens ) / (float)Screen.width * (float)Screen.height );
 
-		CellSize = ( Screen.width ) / ( BoardWidth / 3 );
+		CellSize = Mathf.Round( (float)Screen.width / (float)( BoardWidth / numScreens ) );
 
 		MarginWidth = ( Screen.width - CellSize * BoardWidth ) * 0.5f;
 		MarginHeight = ( Screen.height - CellSize * BoardHeight ) * 0.5f;
