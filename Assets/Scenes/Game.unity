@@ -152,6 +152,10 @@ Prefab:
       propertyPath: shareImage
       value: 
       objectReference: {fileID: 15257087}
+    - target: {fileID: 11409170, guid: 005a3bc5084ed416dbccdde1d842328f, type: 2}
+      propertyPath: spritePrefab
+      value: 
+      objectReference: {fileID: 100000, guid: 0b5c9ba4df4954e28a4b2c63a1e4702a, type: 2}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 005a3bc5084ed416dbccdde1d842328f, type: 2}
   m_IsPrefabParent: 0

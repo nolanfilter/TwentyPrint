@@ -22,7 +22,7 @@ public class BoardAgent : MonoBehaviour {
 		}
 	}
 
-	private static int numScreens = 3;
+	public static int NumScreens = 2;
 
 	public static int BoardSize
 	{
@@ -36,10 +36,10 @@ public class BoardAgent : MonoBehaviour {
 	{
 		get
 		{
-			return ( mBoardWidth / numScreens );
+			return ( mBoardWidth / NumScreens );
 		}
 	}
-
+	
 	public GameObject spritePrefab;
 	private SpriteRenderer[ , ] BoardSprites;
 
@@ -70,9 +70,9 @@ public class BoardAgent : MonoBehaviour {
 
 	void Start()
 	{
-		mBoardHeight = Mathf.CeilToInt( (float)( BoardWidth / numScreens ) / (float)Screen.width * (float)Screen.height );
+		mBoardHeight = Mathf.CeilToInt( (float)( BoardWidth / NumScreens ) / (float)Screen.width * (float)Screen.height );
 
-		CellSize = Mathf.Round( (float)Screen.width / (float)( BoardWidth / numScreens ) );
+		CellSize = (float)Screen.width / (float)( BoardWidth / NumScreens );
 
 		MarginWidth = ( Screen.width - CellSize * BoardWidth ) * 0.5f;
 		MarginHeight = ( Screen.height - CellSize * BoardHeight ) * 0.5f;
@@ -127,6 +127,22 @@ public class BoardAgent : MonoBehaviour {
 		BoardSprites[ (int)position.x, (int)position.y ].enabled = newEnabled;
 	}
 
+	public static bool GetSpriteEnabled( Vector2 position )
+	{
+		if( instance )
+			return instance.internalGetSpriteEnabled( position );
+
+		return true;
+	}
+
+	private bool internalGetSpriteEnabled( Vector2 position )
+	{
+		if( position.x < 0 || position.x > BoardWidth || position.y < 0 || position.y > BoardHeight )
+			return true;
+
+		return BoardSprites[ (int)position.x, (int)position.y ].enabled;
+	}
+
 	public static void SetSpriteScale( Vector2 position, Vector3 newScale )
 	{
 		if( instance )
@@ -164,8 +180,12 @@ public class BoardAgent : MonoBehaviour {
 		SpriteRenderer spriteRenderer = go.GetComponent<SpriteRenderer>();
 
 		float alpha = 1f;
-		if( Mathf.Abs( position.x - Screen.width * 0.5f ) > Screen.width * 0.5f )
-			alpha = Mathf.Lerp( 1f, 0f, ( Mathf.Abs( position.x - Screen.width * 0.5f ) - Screen.width * 0.5f ) / Screen.width );
+
+		float relativeX = Mathf.Abs( position.x - Screen.width * 0.5f ) - Screen.width * 0.5f;
+		if( relativeX > 0f )
+		{
+			alpha = Mathf.Lerp( 0.75f, 0f, relativeX / ( (float)( NumScreens - 1 ) * 0.5f * Screen.width ) );
+		}
 					
 		spriteRenderer.color = new Color( 1f, 1f, 1f, alpha );
 

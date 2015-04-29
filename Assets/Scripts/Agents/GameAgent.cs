@@ -13,7 +13,7 @@ public class GameAgent : MonoBehaviour {
 		Printing = 1,
 		Paused = 2,
 		FastForwarding = 3,
-		Complete = 4,
+		Finished = 4,
 		Advertising = 5,
 		Invalid = 6,
 	}
@@ -26,7 +26,9 @@ public class GameAgent : MonoBehaviour {
 	public Text shareText;
 	public Image shareImage;
 
+	private float fillTime = 10f;
 	private float speed;
+
 	
 	private int index = 0;
 
@@ -42,13 +44,19 @@ public class GameAgent : MonoBehaviour {
 
 	private int mode = 0;
 
+	private int width;
+
 	private float navigationDuration = 0.2f;
 	private float currentScreenX = 0f;
 	private float widthRatio = 1f;
-	private float dragBeginTime;
-	private Vector2 dragBeginPosition;
+	private float dragBeginX;
+	private float dragDeltaX = 0f;
+	private float dragThreshold = 10f;
+	private float swipeThreshold = 10f;
+
 	private bool wasFastForwarding = false;
 	private bool wasSharing = false;
+	private bool wasDragging = false;
 
 	private static GameAgent mInstance = null;
 	public static GameAgent instance
@@ -99,11 +107,11 @@ public class GameAgent : MonoBehaviour {
 		if( canvasScaler )
 			widthRatio = canvasScaler.referenceResolution.x / Screen.width;
 
-		SetShareEnabled( false );
-
 		deck = new int[ BoardAgent.BoardSize ];
 
-		currentState = State.Ready;
+		width = Mathf.CeilToInt( ( (float)( BoardAgent.NumScreens - 1 ) / 2f ) * BoardAgent.ScreenWidth );
+
+		ChangeState( State.Ready );
 	}
 
 	void OnEnable()
@@ -132,25 +140,18 @@ public class GameAgent : MonoBehaviour {
 		FingerGestures.OnFingerDragEnd -= OnDragUp;
 	}
 
-	/*
-	bool tokenSent = false;
-	void  FixedUpdate () {
-		
-		if (!tokenSent) { // tokenSent needs to be defined somewhere (bool tokenSent = false)
-
-			byte[] token   =  UnityEngine.iOS.NotificationServices.deviceToken;
-			
-			if(token != null) {
-				
-				string tokenString =  System.BitConverter.ToString(token).Replace("-", "").ToLower();
-				
-				Debug.Log ("OnTokenReceived");
-				
-				Debug.Log (tokenString);
-				
-			}
-			
+	void OnApplicationPause( bool pauseStatus )
+	{
+		if( !pauseStatus && currentState == State.Printing )
+		{
+			ChangeState( State.Paused );
 		}
+	}
+
+	/*
+	void OnGUI()
+	{
+		GUI.Label( new Rect( 10f, 10f, 1000f, 1000f ), "" + currentState );
 	}
 	*/
 
@@ -195,76 +196,39 @@ public class GameAgent : MonoBehaviour {
 
 	private void OnTouchUp( int fingerIndex, Vector2 fingerPos, float timeHeldDown )
 	{
-		if( !wasSharing && currentScreenX == 0f && Mathf.Abs( CameraAgent.MainCameraObject.transform.localPosition.x ) < Screen.width * 0.125f )
+		if( !wasSharing && CameraAgent.MainCameraObject.transform.localPosition.x == 0f )
 		{
 			switch( currentState )
 			{
 				case State.Ready:
 				{
-					currentState = State.Printing;
-
-					SetShareEnabled( false );
-
-					speed = 50f;
-
-					BoardAgent.ResetBoard();
-					ShuffleDeck();
-					colorOffset = Random.Range( 0f, 360f );
-					
-					StartCoroutine( "DoPrint" );
+					ChangeState( State.Printing );
 				} break;
 
 				case State.Printing:
 				{
-					currentState = State.Paused;
-
-					SetShareEnabled( true );
-
-					speed = 0f;
+					ChangeState( State.Paused );
 				} break;
 
 				case State.Paused:
 				{
-					currentState = State.Printing;
-
-					SetShareEnabled( false );
-
-					speed = 50f;
-
+					ChangeState( State.Printing );
 				} break;
 
 				case State.FastForwarding:
 				{
-					currentState = State.Printing;
-
-					SetShareEnabled( false );
-					
-					speed = 50f;
-					
+					ChangeState( State.Printing );
 				} break;
 
-				case State.Complete:
+				case State.Finished:
 				{
 					if( !wasFastForwarding )
-					{
-						if( Application.isEditor )
-							currentState = State.Advertising;
-						else
-							currentState = State.Ready;
-
-						if( Advertisement.isReady() )
-							Advertisement.Show();
-
-						SetShareEnabled( false );
-
-						BoardAgent.ResetBoard();
-					}
+						ChangeState( State.Advertising );
 				} break;
 
 				case State.Advertising:
 				{
-					if( !Advertisement.isShowing )
-						currentState = State.Ready;
+					ChangeState( State.Ready );
 				} break;
 			}
 		}
@@ -277,11 +241,7 @@ public class GameAgent : MonoBehaviour {
 	{
 		if( currentState == State.Printing )
 		{
-			currentState = State.FastForwarding;
-
-			speed = 500f;
-
-			wasFastForwarding = true;
+			ChangeState( State.FastForwarding );
 		}
 	}
 
@@ -304,23 +264,30 @@ public class GameAgent : MonoBehaviour {
 
 	private void OnDragDown( int fingerIndex, Vector2 fingerPos, Vector2 startPos )
 	{
-		if( currentState == State.Printing || currentState == State.FastForwarding )
-		{
-			currentState = State.Paused;
-
-			SetShareEnabled( true );
-
-			speed = 0f;
-		}
-
-		dragBeginTime = Time.time;
-		dragBeginPosition = startPos;
-
-		StopCoroutine( "DoNavigation" );
+		dragBeginX = startPos.x;
+		dragDeltaX = 0f;
 	}
 	
 	private void OnDragMove( int fingerIndex, Vector2 fingerPos, Vector2 delta )
 	{
+		if( !wasDragging )
+		{
+			if( Mathf.Abs( fingerPos.x - dragBeginX ) > dragThreshold )
+			{
+				if( currentState == State.Printing || currentState == State.FastForwarding )
+				{
+					ChangeState( State.Paused );
+				}
+
+				StopCoroutine( "DoNavigation" );
+
+				wasDragging = true;
+			}
+
+			if( !wasDragging )
+				return;
+		}
+
 		float absPosition = Mathf.Abs( CameraAgent.MainCameraObject.transform.localPosition.x - delta.x );
 
 		if( absPosition < Screen.width * 1.5f )
@@ -330,24 +297,84 @@ public class GameAgent : MonoBehaviour {
 			if( scrollPanelRectTransform )
 				scrollPanelRectTransform.transform.localPosition += Vector3.right * delta.x * widthRatio;
 		}
+
+		dragDeltaX = delta.x;
 	}
 	
 	private void OnDragUp( int fingerIndex, Vector2 fingerPos )
 	{
-		if( Time.time - dragBeginTime < 0.25f )
-		{
-			float deltaFingerPosX = Mathf.Abs( fingerPos.x - dragBeginPosition.x );
-
-			if( deltaFingerPosX > 25f && deltaFingerPosX > Mathf.Abs( fingerPos.y - dragBeginPosition.y ) )
-				currentScreenX -= Screen.width * Mathf.Sign( fingerPos.x - dragBeginPosition.x );
-		}
+		if( Mathf.Abs( dragDeltaX ) > swipeThreshold )
+			currentScreenX -= Screen.width * Mathf.Sign( dragDeltaX );
 		else
-		{
 			currentScreenX = Mathf.Round( CameraAgent.MainCameraObject.transform.localPosition.x / Screen.width ) * Screen.width;
-		}
 
 		currentScreenX = Mathf.Clamp( currentScreenX, Screen.width * -1f, Screen.width );
 		StartCoroutine( "DoNavigation", Vector3.right * currentScreenX );
+
+		wasDragging = false;
+	}
+
+	private void ChangeState( State newState )
+	{
+		if( currentState == newState )
+			return;
+
+		currentState = newState;
+
+		switch( currentState )
+		{
+			case State.Ready:
+			{
+				SetShareEnabled( false );
+
+				BoardAgent.ResetBoard();
+				ShuffleDeck();
+				colorOffset = Random.Range( 0f, 360f );
+
+				index = 0;
+			} break;
+				
+			case State.Printing:
+			{
+				SetShareEnabled( false );
+			
+				speed = (float)BoardAgent.BoardSize / fillTime;
+
+				if( index == 0 )
+					StartCoroutine( "DoPrint" );
+			} break;
+				
+			case State.Paused:
+			{				
+				SetShareEnabled( true );
+				
+				speed = 0f;
+				
+			} break;
+				
+			case State.FastForwarding:
+			{				
+				SetShareEnabled( false );
+				
+				speed = (float)BoardAgent.BoardSize / fillTime * 5f;
+
+				wasFastForwarding = true;
+			} break;
+				
+			case State.Finished:
+			{
+				SetShareEnabled( true );
+			} break;
+				
+			case State.Advertising:
+			{
+				if( Advertisement.isReady() )
+					Advertisement.Show();
+
+				if( !Application.isEditor )
+					ChangeState( State.Ready );
+			} break;
+		}
 	}
 
 	private void SinglePrint()
@@ -360,18 +387,18 @@ public class GameAgent : MonoBehaviour {
 				{
 					int height = BoardAgent.BoardHeight - 1 - index / BoardAgent.ScreenWidth;
 					
-					for( int i = 0; i < BoardAgent.ScreenWidth; i++ )
-						ActivateSprite( new Vector2( i % BoardAgent.ScreenWidth, height ) );
+					for( int i = 0; i < width; i++ )
+						ActivateSprite( new Vector2( i % width, height ) );
 				}
 
-				ActivateSprite( new Vector2( index % BoardAgent.ScreenWidth + BoardAgent.ScreenWidth, BoardAgent.BoardHeight - 1 - index / BoardAgent.ScreenWidth ) );
+				ActivateSprite( new Vector2( index % BoardAgent.ScreenWidth + width, BoardAgent.BoardHeight - 1 - index / BoardAgent.ScreenWidth ) );
 
 				if( index % BoardAgent.ScreenWidth == BoardAgent.ScreenWidth - 1 )
 				{
 					int height = BoardAgent.BoardHeight - 1 - index / BoardAgent.ScreenWidth;
 					
-					for( int i = 0; i < BoardAgent.ScreenWidth; i++ )
-						ActivateSprite( new Vector2( i % BoardAgent.ScreenWidth + BoardAgent.ScreenWidth * 2, height ) );
+					for( int i = 0; i < width; i++ )
+						ActivateSprite( new Vector2( i % width + BoardAgent.ScreenWidth + width, height ) );
 				}
 			} break; 
 
@@ -379,9 +406,9 @@ public class GameAgent : MonoBehaviour {
 			{
 				int deckIndex = deck[index];
 
-				ActivateSprite( new Vector2( deckIndex % BoardAgent.ScreenWidth, BoardAgent.BoardHeight - 1 - deckIndex / BoardAgent.ScreenWidth ) );
-				ActivateSprite( new Vector2( deckIndex % BoardAgent.ScreenWidth + BoardAgent.ScreenWidth, BoardAgent.BoardHeight - 1 - deckIndex / BoardAgent.ScreenWidth ) );
-				ActivateSprite( new Vector2( deckIndex % BoardAgent.ScreenWidth + BoardAgent.ScreenWidth * 2, BoardAgent.BoardHeight - 1 - deckIndex / BoardAgent.ScreenWidth ) );
+				ActivateSprite( new Vector2( deckIndex % width, BoardAgent.BoardHeight - 1 - deckIndex / BoardAgent.ScreenWidth ) );
+				ActivateSprite( new Vector2( deckIndex % BoardAgent.ScreenWidth + width, BoardAgent.BoardHeight - 1 - deckIndex / BoardAgent.ScreenWidth ) );
+				ActivateSprite( new Vector2( deckIndex % width + BoardAgent.ScreenWidth + width, BoardAgent.BoardHeight - 1 - deckIndex / BoardAgent.ScreenWidth ) );
 			} break;
 		}
 	}
@@ -392,9 +419,7 @@ public class GameAgent : MonoBehaviour {
 		
 		mode = ( mode + 1 )%2;
 		
-		currentState = State.Complete;
-		
-		SetShareEnabled( true );
+		ChangeState( State.Finished );
 	}
 
 	private void SetShareEnabled( bool enabled )
@@ -411,6 +436,9 @@ public class GameAgent : MonoBehaviour {
 
 	private IEnumerator DoNavigation( Vector3 toPosition )
 	{
+		if( currentState == State.Printing )
+			ChangeState( State.Paused );
+
 		float beginTime = Time.time;
 		Vector3 fromPosition = CameraAgent.MainCameraObject.transform.localPosition;
 		float currentTime = 0f;
@@ -445,11 +473,6 @@ public class GameAgent : MonoBehaviour {
 
 	private IEnumerator DoPrint()
 	{
-		while( Advertisement.isShowing )
-		{
-			yield return null;
-		}
-
 		index = 0;
 		float currentDistance = 0f;
 
@@ -485,6 +508,9 @@ public class GameAgent : MonoBehaviour {
 
 	private void ActivateSprite( Vector2 position )
 	{
+		if( BoardAgent.GetSpriteEnabled( position ) )
+			return;
+
 		BoardAgent.SetSpriteScale( position, new Vector3( BoardAgent.CellSize * ( Random.value < 0.5f ? 1f : -1f ), BoardAgent.CellSize * ( Random.value < 0.5f ? 1f : -1f ), 1f ) );
 		//BoardAgent.SetSpriteColor( position, Utilities.ColorFromHSV( Random.Range( 0f, 360f ), 1f, 1f ) );
 		//BoardAgent.SetSpriteColor( position, Utilities.ColorFromHSV( ( ( position.y / (float)BoardAgent.BoardHeight ) * 360f + colorOffset )%360f, 1f, 1f ) );
