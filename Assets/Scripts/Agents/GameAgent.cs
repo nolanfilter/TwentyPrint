@@ -29,6 +29,14 @@ public class GameAgent : MonoBehaviour {
 	public Text shareText;
 	public Image shareImage;
 
+	public Image navigationImage;
+	public Image settingsIndent;
+	public Image mainIndent;
+	public Image storeIndent;
+	public Image settingsHighlight;
+	public Image mainHighlight;
+	public Image storeHighlight;
+
 	private float fillTime = 10f;
 	private float speed;
 
@@ -60,8 +68,6 @@ public class GameAgent : MonoBehaviour {
 	private bool wasFastForwarding = false;
 	private bool wasSharing = false;
 	private bool wasDragging = false;
-
-	private List<Text> foregroundTexts;
 	
 	private static GameAgent mInstance = null;
 	public static GameAgent instance
@@ -82,8 +88,6 @@ public class GameAgent : MonoBehaviour {
 		}
 		
 		mInstance = this;
-
-		foregroundTexts = new List<Text>();
 	}
 
 	void Start()
@@ -161,30 +165,6 @@ public class GameAgent : MonoBehaviour {
 		GUI.Label( new Rect( 10f, 10f, 1000f, 1000f ), "" + currentState );
 	}
 	*/
-
-	public static void RegisterForegroundText( Text text )
-	{
-		if( instance )
-			instance.internalRegisterForegroundText( text );
-	}
-	
-	private void internalRegisterForegroundText( Text text )
-	{
-		if( !foregroundTexts.Contains( text ) )
-			foregroundTexts.Add( text );
-	}
-	
-	public static void UnregisterRegisterForegroundText( Text text )
-	{
-		if( instance )
-			instance.internalUnregisterRegisterForegroundText( text );
-	}
-	
-	private void internalUnregisterRegisterForegroundText( Text text )
-    {
-		if( foregroundTexts.Contains( text ) )
-			foregroundTexts.Remove( text );
-	}
             
 	private void OnNotificationScheduleResult( ISN_Result res ) {
 		IOSNotificationController.instance.OnNotificationScheduleResult -= OnNotificationScheduleResult;
@@ -259,7 +239,8 @@ public class GameAgent : MonoBehaviour {
 
 				case State.Advertising:
 				{
-					ChangeState( State.Ready );
+					if( !Advertisement.isShowing )
+						ChangeState( State.Ready );
 				} break;
 			}
 		}
@@ -306,9 +287,9 @@ public class GameAgent : MonoBehaviour {
 			if( Mathf.Abs( fingerPos.x - dragBeginX ) > dragThreshold )
 			{
 				if( currentState == State.Printing || currentState == State.FastForwarding )
-				{
 					ChangeState( State.Paused );
-				}
+				else
+					SetShareEnabled( true );
 
 				StopCoroutine( "DoNavigation" );
 
@@ -358,21 +339,9 @@ public class GameAgent : MonoBehaviour {
 			{
 				SetShareEnabled( false );
 
-				ColorAgent.ColorPack colorPack = ColorAgent.GetCurrentColorPack();
-                
-				CameraAgent.SetBackgroundColor( colorPack.backgroundColor );
-
-				Color color = colorPack.foregroundColor;
-                
-				for( int i = 0; i < foregroundTexts.Count; i++ )
-				{
-					if( color == ColorAgent.RainbowColor )
-						foregroundTexts[i].color = Color.white;
-					else if( color == ColorAgent.RandomColor )
-						foregroundTexts[i].color = Color.white;
-					else
-	                   foregroundTexts[i].color = color;
-				}
+				ColorAgent.UpdateColor( ColorAgent.ColorType.Foreground );
+				ColorAgent.UpdateColor( ColorAgent.ColorType.Background );
+				ColorAgent.UpdateColor( ColorAgent.ColorType.Mid );
 
 				BoardAgent.ResetBoard();
 				ShuffleDeck();
@@ -420,6 +389,8 @@ public class GameAgent : MonoBehaviour {
 
 				if( !Application.isEditor )
 					ChangeState( State.Ready );
+
+				ColorAgent.UpdateColor( ColorAgent.ColorType.Background );
 			} break;
 		}
 	}
@@ -481,6 +452,41 @@ public class GameAgent : MonoBehaviour {
 		
 		if( shareCallback )
 			shareCallback.enabled = enabled;
+
+		if( navigationImage )
+			navigationImage.enabled = enabled;
+
+		if( settingsIndent )
+			settingsIndent.enabled = enabled;
+
+		if( mainIndent )
+			mainIndent.enabled = enabled;
+
+		if( storeIndent )
+			storeIndent.enabled = enabled;
+
+		if( settingsHighlight )
+			settingsHighlight.enabled = enabled;
+
+		if( mainHighlight )
+			mainHighlight.enabled = enabled;
+
+		if( storeHighlight )
+			storeHighlight.enabled = enabled;
+
+		UpdateNavigationHighlight( enabled );
+	}
+
+	private void UpdateNavigationHighlight( bool canShow )
+	{
+		if( settingsHighlight )
+			settingsHighlight.enabled = ( canShow && currentScreenX == Screen.width * -1f );
+		
+		if( mainHighlight )
+			mainHighlight.enabled = ( canShow && currentScreenX == 0f );
+		
+		if( storeHighlight )
+			storeHighlight.enabled = ( canShow && currentScreenX == Screen.width );
 	}
 
 	private IEnumerator DoNavigation( Vector3 toPosition )
@@ -517,6 +523,11 @@ public class GameAgent : MonoBehaviour {
 		} while( currentTime < navigationDuration );
 
 		CameraAgent.MainCameraObject.transform.localPosition = toPosition;
+
+		UpdateNavigationHighlight( true );
+
+		if( currentState == State.Ready && currentScreenX == 0f )
+			SetShareEnabled( false );
 	}
 
 	private IEnumerator DoPrint()

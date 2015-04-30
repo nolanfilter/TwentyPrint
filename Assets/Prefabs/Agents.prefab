@@ -11,6 +11,7 @@ GameObject:
   - 114: {fileID: 11423030}
   - 114: {fileID: 11409170}
   - 114: {fileID: 11459104}
+  - 114: {fileID: 11497202}
   m_Layer: 0
   m_Name: Agents
   m_TagString: Untagged
@@ -41,7 +42,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d461a43ffe4a24e6e90245b22519921c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spritePrefab: {fileID: 100000, guid: 3282492d8d95d4e9999a8d7fc83e9091, type: 2}
+  spritePrefab: {fileID: 100000, guid: e2e01bea2c01a41bab6600b31b48d991, type: 2}
 --- !u!114 &11423030
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -53,11 +54,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b4726897df0cb4acca8f092f0ded0703, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  sprites:
+  - {fileID: 21300000, guid: 7733bb226905846f1957b0e46cb2e8ee, type: 3}
+  - {fileID: 21300000, guid: d544da1ee9c0c4b2d891f392be12aadd, type: 3}
+  - {fileID: 21300000, guid: 71a91e9c694204c8884618c826a7bd68, type: 3}
+  - {fileID: 21300000, guid: b1914b249dbf34011823e1fcfc98326a, type: 3}
+  - {fileID: 21300000, guid: 7e42408e5226e45e6b88128493ce53d8, type: 3}
+  - {fileID: 21300000, guid: 5b05c1a0b69bb446d8ec7a2b1320d082, type: 3}
   canvasScaler: {fileID: 0}
   scrollPanelRectTransform: {fileID: 0}
   shareCallback: {fileID: 0}
   shareText: {fileID: 0}
   shareImage: {fileID: 0}
+  navigationImage: {fileID: 0}
+  settingsIndent: {fileID: 0}
+  mainIndent: {fileID: 0}
+  storeIndent: {fileID: 0}
+  settingsHighlight: {fileID: 0}
+  mainHighlight: {fileID: 0}
+  storeHighlight: {fileID: 0}
 --- !u!114 &11459104
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -67,6 +82,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cce73452ba2ca453ba5cce7d213e3f33, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &11497202
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 107724}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c962aac497a984f8dae89fd886bcf315, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1001 &100100000
