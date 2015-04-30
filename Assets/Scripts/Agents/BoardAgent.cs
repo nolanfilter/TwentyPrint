@@ -4,7 +4,8 @@ using System.Collections.Generic;
 
 public class BoardAgent : MonoBehaviour {
 
-	private static int mBoardWidth = 75;
+	//has to be odd
+	private static int mBoardWidth = 51;
 	public static int BoardWidth
 	{
 		get
@@ -141,6 +142,20 @@ public class BoardAgent : MonoBehaviour {
 			return true;
 
 		return BoardSprites[ (int)position.x, (int)position.y ].enabled;
+	}
+
+	public static void SetSpriteImage( Vector2 position, Sprite sprite )
+	{
+		if( instance )
+			instance.internalSetSpriteImage( position, sprite );
+	}
+	
+	private void internalSetSpriteImage( Vector2 position, Sprite sprite )
+	{
+		if( position.x < 0 || position.x > BoardWidth || position.y < 0 || position.y > BoardHeight )
+			return;
+		
+		BoardSprites[ (int)position.x, (int)position.y ].sprite = sprite;
 	}
 
 	public static void SetSpriteScale( Vector2 position, Vector3 newScale )

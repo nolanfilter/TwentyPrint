@@ -3,6 +3,7 @@ using UnityEngine.Advertisements;
 using UnityEngine.iOS;
 using UnityEngine.UI;
 using System.Collections;
+using System.Collections.Generic;
 using UnionAssets.FLE;
 
 public class GameAgent : MonoBehaviour {
@@ -19,6 +20,8 @@ public class GameAgent : MonoBehaviour {
 	}
 	private State currentState = State.Invalid;
 
+	public Sprite[] sprites;
+
 	public CanvasScaler canvasScaler; 
 	public RectTransform scrollPanelRectTransform;
 
@@ -29,8 +32,8 @@ public class GameAgent : MonoBehaviour {
 	private float fillTime = 10f;
 	private float speed;
 
-	
 	private int index = 0;
+	private int spriteIndex = 0;
 
 	private int[] deck;
 
@@ -44,20 +47,22 @@ public class GameAgent : MonoBehaviour {
 
 	private int mode = 0;
 
-	private int width;
+	private int offscreenWidth;
 
 	private float navigationDuration = 0.2f;
 	private float currentScreenX = 0f;
 	private float widthRatio = 1f;
 	private float dragBeginX;
 	private float dragDeltaX = 0f;
-	private float dragThreshold = 10f;
-	private float swipeThreshold = 10f;
+	private float dragThreshold = 15f;
+	private float swipeThreshold = 20f;
 
 	private bool wasFastForwarding = false;
 	private bool wasSharing = false;
 	private bool wasDragging = false;
 
+	private List<Text> foregroundTexts;
+	
 	private static GameAgent mInstance = null;
 	public static GameAgent instance
 	{
@@ -77,6 +82,8 @@ public class GameAgent : MonoBehaviour {
 		}
 		
 		mInstance = this;
+
+		foregroundTexts = new List<Text>();
 	}
 
 	void Start()
@@ -109,7 +116,7 @@ public class GameAgent : MonoBehaviour {
 
 		deck = new int[ BoardAgent.BoardSize ];
 
-		width = Mathf.CeilToInt( ( (float)( BoardAgent.NumScreens - 1 ) / 2f ) * BoardAgent.ScreenWidth );
+		offscreenWidth = Mathf.CeilToInt( ( (float)( BoardAgent.NumScreens - 1 ) * 0.5f ) * BoardAgent.ScreenWidth );
 
 		ChangeState( State.Ready );
 	}
@@ -142,7 +149,7 @@ public class GameAgent : MonoBehaviour {
 
 	void OnApplicationPause( bool pauseStatus )
 	{
-		if( !pauseStatus && currentState == State.Printing )
+		if( pauseStatus && currentState == State.Printing )
 		{
 			ChangeState( State.Paused );
 		}
@@ -155,6 +162,30 @@ public class GameAgent : MonoBehaviour {
 	}
 	*/
 
+	public static void RegisterForegroundText( Text text )
+	{
+		if( instance )
+			instance.internalRegisterForegroundText( text );
+	}
+	
+	private void internalRegisterForegroundText( Text text )
+	{
+		if( !foregroundTexts.Contains( text ) )
+			foregroundTexts.Add( text );
+	}
+	
+	public static void UnregisterRegisterForegroundText( Text text )
+	{
+		if( instance )
+			instance.internalUnregisterRegisterForegroundText( text );
+	}
+	
+	private void internalUnregisterRegisterForegroundText( Text text )
+    {
+		if( foregroundTexts.Contains( text ) )
+			foregroundTexts.Remove( text );
+	}
+            
 	private void OnNotificationScheduleResult( ISN_Result res ) {
 		IOSNotificationController.instance.OnNotificationScheduleResult -= OnNotificationScheduleResult;
 		string msg = string.Empty;
@@ -247,7 +278,7 @@ public class GameAgent : MonoBehaviour {
 
 	private void OnDoubleTap( int fingerIndex, Vector2 fingerPos )
 	{
-		if( currentState == State.Printing )
+		if( ( currentState == State.Printing || currentState == State.Paused ) && CameraAgent.MainCameraObject.transform.localPosition.x == 0f )
 		{
 			StopCoroutine( "DoPrint" );
 
@@ -327,6 +358,22 @@ public class GameAgent : MonoBehaviour {
 			{
 				SetShareEnabled( false );
 
+				ColorAgent.ColorPack colorPack = ColorAgent.GetCurrentColorPack();
+                
+				CameraAgent.SetBackgroundColor( colorPack.backgroundColor );
+
+				Color color = colorPack.foregroundColor;
+                
+				for( int i = 0; i < foregroundTexts.Count; i++ )
+				{
+					if( color == ColorAgent.RainbowColor )
+						foregroundTexts[i].color = Color.white;
+					else if( color == ColorAgent.RandomColor )
+						foregroundTexts[i].color = Color.white;
+					else
+	                   foregroundTexts[i].color = color;
+				}
+
 				BoardAgent.ResetBoard();
 				ShuffleDeck();
 				colorOffset = Random.Range( 0f, 360f );
@@ -387,18 +434,18 @@ public class GameAgent : MonoBehaviour {
 				{
 					int height = BoardAgent.BoardHeight - 1 - index / BoardAgent.ScreenWidth;
 					
-					for( int i = 0; i < width; i++ )
-						ActivateSprite( new Vector2( i % width, height ) );
+					for( int i = 0; i < offscreenWidth; i++ )
+						ActivateSprite( new Vector2( i % offscreenWidth, height ) );
 				}
 
-				ActivateSprite( new Vector2( index % BoardAgent.ScreenWidth + width, BoardAgent.BoardHeight - 1 - index / BoardAgent.ScreenWidth ) );
+				ActivateSprite( new Vector2( index % BoardAgent.ScreenWidth + offscreenWidth, BoardAgent.BoardHeight - 1 - index / BoardAgent.ScreenWidth ) );
 
 				if( index % BoardAgent.ScreenWidth == BoardAgent.ScreenWidth - 1 )
 				{
 					int height = BoardAgent.BoardHeight - 1 - index / BoardAgent.ScreenWidth;
 					
-					for( int i = 0; i < width; i++ )
-						ActivateSprite( new Vector2( i % width + BoardAgent.ScreenWidth + width, height ) );
+					for( int i = 0; i < offscreenWidth; i++ )
+						ActivateSprite( new Vector2( i % offscreenWidth + BoardAgent.ScreenWidth + offscreenWidth, height ) );
 				}
 			} break; 
 
@@ -406,9 +453,9 @@ public class GameAgent : MonoBehaviour {
 			{
 				int deckIndex = deck[index];
 
-				ActivateSprite( new Vector2( deckIndex % width, BoardAgent.BoardHeight - 1 - deckIndex / BoardAgent.ScreenWidth ) );
-				ActivateSprite( new Vector2( deckIndex % BoardAgent.ScreenWidth + width, BoardAgent.BoardHeight - 1 - deckIndex / BoardAgent.ScreenWidth ) );
-				ActivateSprite( new Vector2( deckIndex % width + BoardAgent.ScreenWidth + width, BoardAgent.BoardHeight - 1 - deckIndex / BoardAgent.ScreenWidth ) );
+				ActivateSprite( new Vector2( deckIndex % offscreenWidth, BoardAgent.BoardHeight - 1 - deckIndex / BoardAgent.ScreenWidth ) );
+				ActivateSprite( new Vector2( deckIndex % BoardAgent.ScreenWidth + offscreenWidth, BoardAgent.BoardHeight - 1 - deckIndex / BoardAgent.ScreenWidth ) );
+				ActivateSprite( new Vector2( deckIndex % offscreenWidth + BoardAgent.ScreenWidth + offscreenWidth, BoardAgent.BoardHeight - 1 - deckIndex / BoardAgent.ScreenWidth ) );
 			} break;
 		}
 	}
@@ -417,7 +464,9 @@ public class GameAgent : MonoBehaviour {
 	{
 		numTimesPrinted++;
 		
-		mode = ( mode + 1 )%2;
+		mode = Random.Range( 0, 2 );
+		spriteIndex = Random.Range( 0, sprites.Length );
+		ColorAgent.AdvanceColorPack();
 		
 		ChangeState( State.Finished );
 	}
@@ -439,7 +488,6 @@ public class GameAgent : MonoBehaviour {
 		if( currentState == State.Printing )
 			ChangeState( State.Paused );
 
-		float beginTime = Time.time;
 		Vector3 fromPosition = CameraAgent.MainCameraObject.transform.localPosition;
 		float currentTime = 0f;
 		float lerp;
@@ -511,9 +559,18 @@ public class GameAgent : MonoBehaviour {
 		if( BoardAgent.GetSpriteEnabled( position ) )
 			return;
 
+		BoardAgent.SetSpriteImage( position, sprites[ spriteIndex ] );
+
+		Color color = ColorAgent.GetCurrentColorPack().foregroundColor;
+
+		if( color == ColorAgent.RainbowColor )
+			BoardAgent.SetSpriteColor( position, Utilities.ColorFromHSV( ( ( position.y / (float)BoardAgent.BoardHeight ) * 360f + colorOffset )%360f, 1f, 1f ) );
+		else if( color == ColorAgent.RandomColor )
+			BoardAgent.SetSpriteColor( position, Utilities.ColorFromHSV( Random.Range( 0f, 360f ), 1f, 1f ) );
+		else
+			BoardAgent.SetSpriteColor( position, color );
+
 		BoardAgent.SetSpriteScale( position, new Vector3( BoardAgent.CellSize * ( Random.value < 0.5f ? 1f : -1f ), BoardAgent.CellSize * ( Random.value < 0.5f ? 1f : -1f ), 1f ) );
-		//BoardAgent.SetSpriteColor( position, Utilities.ColorFromHSV( Random.Range( 0f, 360f ), 1f, 1f ) );
-		//BoardAgent.SetSpriteColor( position, Utilities.ColorFromHSV( ( ( position.y / (float)BoardAgent.BoardHeight ) * 360f + colorOffset )%360f, 1f, 1f ) );
 		BoardAgent.SetSpriteEnabled( position, true );
 	}
 
