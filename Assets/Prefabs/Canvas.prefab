@@ -27,7 +27,6 @@ GameObject:
   m_Component:
   - 224: {fileID: 22458504}
   - 114: {fileID: 11449272}
-  - 114: {fileID: 11478960}
   m_Layer: 5
   m_Name: ShareCallback
   m_TagString: Untagged
@@ -603,17 +602,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   colorType: 0
---- !u!114 &11478960
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 103300}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7199df4e6a11847b8a2ae959f54c2c5b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &11480370
 MonoBehaviour:
   m_ObjectHideFlags: 1

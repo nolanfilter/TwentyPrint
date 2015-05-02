@@ -143,7 +143,7 @@ Prefab:
     - target: {fileID: 11423030, guid: 005a3bc5084ed416dbccdde1d842328f, type: 2}
       propertyPath: shareCallback
       value: 
-      objectReference: {fileID: 1484311590}
+      objectReference: {fileID: 872941102}
     - target: {fileID: 11423030, guid: 005a3bc5084ed416dbccdde1d842328f, type: 2}
       propertyPath: shareText
       value: 
@@ -236,6 +236,12 @@ MonoBehaviour:
     type: 2}
   m_PrefabInternal: {fileID: 1510882687}
   m_Script: {fileID: -765806418, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+--- !u!114 &872941102 stripped
+MonoBehaviour:
+  m_PrefabParentObject: {fileID: 11449272, guid: 1244ebc8acb64460da2cbf2ccf747ba0,
+    type: 2}
+  m_PrefabInternal: {fileID: 1510882687}
+  m_Script: {fileID: 11500000, guid: 7199df4e6a11847b8a2ae959f54c2c5b, type: 3}
 --- !u!1001 &889416158
 Prefab:
   m_ObjectHideFlags: 0
@@ -296,12 +302,6 @@ MonoBehaviour:
     type: 2}
   m_PrefabInternal: {fileID: 1510882687}
   m_Script: {fileID: 1980459831, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
---- !u!114 &1484311590 stripped
-MonoBehaviour:
-  m_PrefabParentObject: {fileID: 11478960, guid: 1244ebc8acb64460da2cbf2ccf747ba0,
-    type: 2}
-  m_PrefabInternal: {fileID: 1510882687}
-  m_Script: {fileID: 11500000, guid: 7199df4e6a11847b8a2ae959f54c2c5b, type: 3}
 --- !u!1001 &1510882687
 Prefab:
   m_ObjectHideFlags: 0

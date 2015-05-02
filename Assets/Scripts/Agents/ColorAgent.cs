@@ -10,7 +10,8 @@ public class ColorAgent : MonoBehaviour {
 		Classic = 0,
 		BlackOnWhite = 1,
 		RainbowOnBlack = 2,
-		Invalid = 3,
+		RandomOnSpacetime = 3,
+		Invalid = 4,
 	}
 
 	public enum ColorType
@@ -92,6 +93,7 @@ public class ColorAgent : MonoBehaviour {
 		colorPacks[ (int)ColorPackType.Classic ] = new ColorPack( Color.white, new Color( 0f, 0.5f, 0.75f ) );
 		colorPacks[ (int)ColorPackType.BlackOnWhite ] = new ColorPack( Color.black, Color.white );
 		colorPacks[ (int)ColorPackType.RainbowOnBlack ] = new ColorPack( RainbowColor, Color.black );
+		colorPacks[ (int)ColorPackType.RandomOnSpacetime ] = new ColorPack( RandomColor, new Color( 0.06f, 0.1f, 0.14f ) );
 
 		currentColors = new Color[  Enum.GetNames( typeof( ColorType ) ).Length - 1 ];
 		colorControllers = new List<ColorController>[ Enum.GetNames( typeof( ColorType ) ).Length - 1 ];
@@ -180,6 +182,10 @@ public class ColorAgent : MonoBehaviour {
 		if( currentColors[ colorIndex ] == color )
 			return;
 
+		if( colorType == ColorType.Foreground && ( color == RainbowColor || color == RandomColor ) )
+			color = ( GetCurrentColorPack().backgroundColor == Color.white ? Color.black : Color.white );
+
+		/*
 		switch( colorType )
 		{
 			case ColorType.Foreground:
@@ -193,6 +199,7 @@ public class ColorAgent : MonoBehaviour {
 
 			case ColorType.Background:
 			{
+				StopCoroutine( "DoBackgroundFade" );
 				StartCoroutine( "DoBackgroundFade", color );
 			} break;
 
@@ -202,6 +209,10 @@ public class ColorAgent : MonoBehaviour {
 					colorControllers[ colorIndex ][i].SetColor( color );
 			} break;
 		}
+		*/
+
+		for( int i = 0; i < colorControllers[ colorIndex ].Count; i++ )
+			colorControllers[ colorIndex ][i].SetColor( color );
 
 		currentColors[ colorIndex ] = color;
 	}
@@ -219,7 +230,7 @@ public class ColorAgent : MonoBehaviour {
 		{
 			currentTime += Time.deltaTime;
 			lerp = Mathf.Clamp01( currentTime / fadeDuration );
-			
+
 			lerp = 3f * Mathf.Pow( lerp, 2f ) - 2f * Mathf.Pow( lerp, 3f );
 			
 			color = Color.Lerp( fromColor, toColor, lerp );

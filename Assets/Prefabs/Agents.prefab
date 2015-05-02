@@ -12,6 +12,7 @@ GameObject:
   - 114: {fileID: 11409170}
   - 114: {fileID: 11459104}
   - 114: {fileID: 11497202}
+  - 114: {fileID: 11491678}
   m_Layer: 0
   m_Name: Agents
   m_TagString: Untagged
@@ -60,7 +61,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 71a91e9c694204c8884618c826a7bd68, type: 3}
   - {fileID: 21300000, guid: b1914b249dbf34011823e1fcfc98326a, type: 3}
   - {fileID: 21300000, guid: 7e42408e5226e45e6b88128493ce53d8, type: 3}
-  - {fileID: 21300000, guid: 5b05c1a0b69bb446d8ec7a2b1320d082, type: 3}
+  - {fileID: 21300000, guid: 6e610d0d4ac534322914864ade611ef2, type: 3}
   canvasScaler: {fileID: 0}
   scrollPanelRectTransform: {fileID: 0}
   shareCallback: {fileID: 0}
@@ -82,6 +83,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cce73452ba2ca453ba5cce7d213e3f33, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &11491678
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 107724}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7654e33c9099491eb61b4fd3c605ca1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &11497202

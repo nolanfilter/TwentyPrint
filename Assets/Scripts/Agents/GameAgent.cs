@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.Advertisements;
 using UnityEngine.iOS;
 using UnityEngine.UI;
 using System.Collections;
@@ -8,7 +7,7 @@ using UnionAssets.FLE;
 
 public class GameAgent : MonoBehaviour {
 	
-	enum State
+	public enum State
 	{
 		Ready = 0,
 		Printing = 1,
@@ -19,7 +18,8 @@ public class GameAgent : MonoBehaviour {
 		Invalid = 6,
 	}
 	private State currentState = State.Invalid;
-
+	private State afterAdState;
+	
 	public Sprite[] sprites;
 
 	public CanvasScaler canvasScaler; 
@@ -47,10 +47,6 @@ public class GameAgent : MonoBehaviour {
 
 	private float colorOffset;
 	
-	private const string iosGameID = "32974";
-	private const string androidGameID = "33171";
-	private string gameID;
-
 	private int numTimesPrinted = 0;
 
 	private int mode = 0;
@@ -68,7 +64,7 @@ public class GameAgent : MonoBehaviour {
 	private bool wasFastForwarding = false;
 	private bool wasSharing = false;
 	private bool wasDragging = false;
-	
+
 	private static GameAgent mInstance = null;
 	public static GameAgent instance
 	{
@@ -92,15 +88,6 @@ public class GameAgent : MonoBehaviour {
 
 	void Start()
 	{
-#if UNITY_IOS
-		gameID = iosGameID;
-#elif UNITY_ANDROID
-		gameID = androidGameID;
-#endif
-
-		Advertisement.Initialize( gameID, true );
-		Advertisement.allowPrecache = true;
-
 		UnityEngine.iOS.NotificationServices.RegisterForNotifications( NotificationType.Alert | NotificationType.Badge | NotificationType.Sound );
 
 		//IOSNotificationController.instance.RequestNotificationPermissions();
@@ -121,6 +108,8 @@ public class GameAgent : MonoBehaviour {
 		deck = new int[ BoardAgent.BoardSize ];
 
 		offscreenWidth = Mathf.CeilToInt( ( (float)( BoardAgent.NumScreens - 1 ) * 0.5f ) * BoardAgent.ScreenWidth );
+
+		afterAdState = ( Application.isEditor ? State.Advertising : State.Ready );
 
 		ChangeState( State.Ready );
 	}
@@ -157,6 +146,11 @@ public class GameAgent : MonoBehaviour {
 		{
 			ChangeState( State.Paused );
 		}
+
+		if( !pauseStatus && currentState == State.Advertising )
+		{
+			ChangeState( State.Finished );
+		}
 	}
 
 	/*
@@ -165,7 +159,7 @@ public class GameAgent : MonoBehaviour {
 		GUI.Label( new Rect( 10f, 10f, 1000f, 1000f ), "" + currentState );
 	}
 	*/
-            
+
 	private void OnNotificationScheduleResult( ISN_Result res ) {
 		IOSNotificationController.instance.OnNotificationScheduleResult -= OnNotificationScheduleResult;
 		string msg = string.Empty;
@@ -207,7 +201,7 @@ public class GameAgent : MonoBehaviour {
 
 	private void OnTouchUp( int fingerIndex, Vector2 fingerPos, float timeHeldDown )
 	{
-		if( !wasSharing && CameraAgent.MainCameraObject.transform.localPosition.x == 0f )
+		if( !wasSharing && !wasDragging && CameraAgent.MainCameraObject.transform.localPosition.x == 0f )
 		{
 			switch( currentState )
 			{
@@ -239,7 +233,7 @@ public class GameAgent : MonoBehaviour {
 
 				case State.Advertising:
 				{
-					if( !Advertisement.isShowing )
+					if( Application.isEditor && !AdAgent.GetIsShowing() )
 						ChangeState( State.Ready );
 				} break;
 			}
@@ -326,7 +320,29 @@ public class GameAgent : MonoBehaviour {
 		wasDragging = false;
 	}
 
-	private void ChangeState( State newState )
+	public static State GetCurrentState()
+	{
+		if( instance )
+			return instance.currentState;
+		
+		return State.Invalid;
+	}
+
+	public static State GetAfterAdState()
+	{
+		if( instance )
+			return instance.afterAdState;
+		
+		return State.Invalid;
+	}
+
+	public static void ChangeState( State newState )
+	{
+		if( instance )
+			instance.internalChangeState( newState );
+	}
+
+	private void internalChangeState( State newState )
 	{
 		if( currentState == newState )
 			return;
@@ -384,13 +400,7 @@ public class GameAgent : MonoBehaviour {
 				
 			case State.Advertising:
 			{
-				if( Advertisement.isReady() )
-					Advertisement.Show();
-
-				if( !Application.isEditor )
-					ChangeState( State.Ready );
-
-				ColorAgent.UpdateColor( ColorAgent.ColorType.Background );
+				AdAgent.ShowInterstitialImage();
 			} break;
 		}
 	}
@@ -424,9 +434,22 @@ public class GameAgent : MonoBehaviour {
 			{
 				int deckIndex = deck[index];
 
-				ActivateSprite( new Vector2( deckIndex % offscreenWidth, BoardAgent.BoardHeight - 1 - deckIndex / BoardAgent.ScreenWidth ) );
+				if( offscreenWidth < BoardAgent.ScreenWidth )
+				{
+					if( deckIndex % BoardAgent.ScreenWidth >= offscreenWidth )
+						ActivateSprite( new Vector2( deckIndex % BoardAgent.ScreenWidth - offscreenWidth + 1, BoardAgent.BoardHeight - 1 - deckIndex / BoardAgent.ScreenWidth ) );
+
+					if( deckIndex % BoardAgent.ScreenWidth < offscreenWidth )
+						ActivateSprite( new Vector2( deckIndex % BoardAgent.ScreenWidth + BoardAgent.ScreenWidth + offscreenWidth, BoardAgent.BoardHeight - 1 - deckIndex / BoardAgent.ScreenWidth ) );
+				}
+				else if( offscreenWidth == BoardAgent.ScreenWidth )
+				{
+					ActivateSprite( new Vector2( deckIndex % offscreenWidth, BoardAgent.BoardHeight - 1 - deckIndex / BoardAgent.ScreenWidth ) );
+					ActivateSprite( new Vector2( deckIndex % offscreenWidth + BoardAgent.ScreenWidth + offscreenWidth, BoardAgent.BoardHeight - 1 - deckIndex / BoardAgent.ScreenWidth ) );
+				}
+
 				ActivateSprite( new Vector2( deckIndex % BoardAgent.ScreenWidth + offscreenWidth, BoardAgent.BoardHeight - 1 - deckIndex / BoardAgent.ScreenWidth ) );
-				ActivateSprite( new Vector2( deckIndex % offscreenWidth + BoardAgent.ScreenWidth + offscreenWidth, BoardAgent.BoardHeight - 1 - deckIndex / BoardAgent.ScreenWidth ) );
+				
 			} break;
 		}
 	}
