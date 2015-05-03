@@ -49,10 +49,8 @@ public class SpriteAgent : MonoBehaviour {
 		{
 			string spriteName = sprites[i].name;
 
-			//if( !PlayerPrefs.HasKey( spriteName ) )
-			//	PlayerPrefs.SetInt( spriteName, ( System.Array.IndexOf( freeSprites, sprites[i].name ) != -1 ? 1 : 0 ) );
-
-			PlayerPrefs.SetInt( spriteName, 1 );
+			if( !PlayerPrefs.HasKey( spriteName ) )
+				PlayerPrefs.SetInt( spriteName, ( System.Array.IndexOf( freeSprites, sprites[i].name ) != -1 ? 1 : 0 ) );
 
 			bool spriteUnlocked = ( PlayerPrefs.GetInt( spriteName ) == 1 );
 
@@ -158,13 +156,25 @@ public class SpriteAgent : MonoBehaviour {
 		randomSpriteIndex = unlockedSpriteIndices[ Random.Range( 0, unlockedSpriteIndices.Count ) ];
 	}
 
-	public static void UnlockSprite()
+	public static void UnlockAllSprites()
+	{
+		if( instance )
+			instance.internalUnlockAllSprites();
+	}
+
+	private void internalUnlockAllSprites()
+	{
+		for( int i = 0; i < sprites.Length; i++ )
+			UnlockSprite( i );
+	}
+
+	public static void WatchedAd()
 	{
 		if( instance )
 			instance.hasWatchedAd = true;
 	}
 
-	public static void LeaveSpriteLocked()
+	public static void DidNotWatchAd()
 	{
 		if( instance )
 			instance.StopCoroutine( "WaitForAdSuccess" );
@@ -189,17 +199,25 @@ public class SpriteAgent : MonoBehaviour {
 		while( !hasWatchedAd )
 			yield return null;
 
+		UnlockSprite( spriteIndexToUnlock );
+
+		SetSpriteIndex( spriteIndexToUnlock );
+	}
+
+	private void UnlockSprite( int spriteIndexToUnlock )
+	{
 		string spriteName = sprites[ spriteIndexToUnlock ].name;
+
+		if( spritesUnlocked[ spriteName ] )
+			return;
 
 		spritesUnlocked[ spriteName ] = true;
 		PlayerPrefs.SetInt( spriteName, 1 );
-
+		
 		unlockedSpriteIndices.Add( spriteIndexToUnlock );
-
+		
 		storeSpriteControllers[ spriteIndexToUnlock ].sprite.color = new Color( storeSpriteControllers[ spriteIndexToUnlock ].sprite.color.r, storeSpriteControllers[ spriteIndexToUnlock ].sprite.color.g, storeSpriteControllers[ spriteIndexToUnlock ].sprite.color.b, 1f );
 		storeSpriteControllers[ spriteIndexToUnlock ].background.color = new Color( storeSpriteControllers[ spriteIndexToUnlock ].background.color.r, storeSpriteControllers[ spriteIndexToUnlock ].background.color.g, storeSpriteControllers[ spriteIndexToUnlock ].background.color.b, 1f );
 		storeSpriteControllers[ spriteIndexToUnlock ].outline.color = new Color( storeSpriteControllers[ spriteIndexToUnlock ].outline.color.r, storeSpriteControllers[ spriteIndexToUnlock ].outline.color.g, storeSpriteControllers[ spriteIndexToUnlock ].outline.color.b, 1f );
-
-		SetSpriteIndex( spriteIndexToUnlock );
 	}
 }

@@ -101,7 +101,6 @@ public class AdAgent : MonoBehaviour {
 						case ShowResult.Finished: GameAgent.ChangeState( GameAgent.GetAfterAdState() ); break;
 						case ShowResult.Failed: GameAgent.ChangeState( GameAgent.GetAfterAdState() ); break;
 						case ShowResult.Skipped: GameAgent.ChangeState( GameAgent.GetAfterAdState() ); break;
-						//case ShowResult.Skipped: GameAgent.ChangeState( GameAgent.State.Finished ); break;
 					}
 				}
 			} );
@@ -127,16 +126,16 @@ public class AdAgent : MonoBehaviour {
 				resultCallback = result => {
 					switch( result )
 					{
-						case ShowResult.Finished: SpriteAgent.UnlockSprite(); break;
-						case ShowResult.Failed: SpriteAgent.LeaveSpriteLocked(); break;
-						case ShowResult.Skipped: SpriteAgent.LeaveSpriteLocked(); break;
+						case ShowResult.Finished: SpriteAgent.WatchedAd(); break;
+						case ShowResult.Failed: SpriteAgent.DidNotWatchAd(); break;
+						case ShowResult.Skipped: SpriteAgent.DidNotWatchAd(); break;
 					}
 				}
 			} );
 		}
 		else
 		{
-			 SpriteAgent.LeaveSpriteLocked();
+			 SpriteAgent.DidNotWatchAd();
 		}
 	}
 

@@ -26,7 +26,7 @@ public class GameAgent : MonoBehaviour {
 	public TouchDownCallback shareCallback;
 	public Text shareText;
 	public Image shareImage;
-
+	
 	public Image navigationImage;
 	public Image settingsIndent;
 	public Image mainIndent;
@@ -41,6 +41,8 @@ public class GameAgent : MonoBehaviour {
 	public TouchDownCallback soundsCallback;
 	public TouchDownCallback supportCallback;
 	public TouchDownCallback moreCallback;
+
+	public Text soundsText;
 
 	private float fillTime = 10f;
 	private float speed;
@@ -182,9 +184,18 @@ public class GameAgent : MonoBehaviour {
 
 	void OnApplicationPause( bool pauseStatus )
 	{
-		if( pauseStatus && currentState == State.Printing )
-		{
-			ChangeState( State.Paused );
+		if( pauseStatus )
+		{ 
+			if( currentState == State.Printing )
+			{
+				ChangeState( State.Paused );
+				TipAgent.SetFirstTip();
+			}
+
+			if( currentState == State.Paused || currentState == State.Finished )
+			{
+				TipAgent.SetFirstTip();
+			}
 		}
 
 		if( !pauseStatus && currentState == State.Advertising )
@@ -241,27 +252,41 @@ public class GameAgent : MonoBehaviour {
 
 	private void OnRemoveAdsAreaTouch()
 	{
-
+		IAPAgent.PurchaseRemoveAds();
 	}
 
 	private void OnRestorePurchasesAreaTouch()
 	{
-        
+		IAPAgent.RestorePurchases();
     }
 
 	private void OnSoundsAreaTouch()
 	{
-        
+		if( soundsText )
+		{
+			if( soundsText.text == "Sounds off" )
+				soundsText.text = "Sounds on";
+			else if( soundsText.text == "Sounds on" )
+				soundsText.text = "Sounds off";
+		}
     }
 
 	private void OnSupportAreaTouch()
 	{
-        
+		if( Application.isEditor )
+			Application.OpenURL( "http://www.twentypercentgames.com/contact" );
+		else
+			IOSSharedApplication.instance.OpenUrl( "http://www.twentypercentgames.com/contact" );
     }
 
 	private void OnMoreAreaTouch()
 	{
-        
+		Debug.Log( "more" );
+
+		if( Application.isEditor )
+			Application.OpenURL( "http://itunes.com/TwentyPercent" );
+		else
+			IOSSharedApplication.instance.OpenUrl( "itms-apps://itunes.com/TwentyPercent" );
     }
 
 	private void OnTouchUp( int fingerIndex, Vector2 fingerPos, float timeHeldDown )
@@ -310,9 +335,17 @@ public class GameAgent : MonoBehaviour {
 
 	private void OnLongPress( int fingerIndex, Vector2 fingerPos )
 	{
-		if( currentState == State.Printing )
+		if( CameraAgent.MainCameraObject.transform.localPosition.x == 0f )
 		{
-			ChangeState( State.FastForwarding );
+			if( currentState == State.Ready )
+			{
+				ChangeState( State.Printing );
+			}
+
+			if( currentState == State.Printing || currentState == State.Paused )
+			{
+				ChangeState( State.FastForwarding );
+			}
 		}
 	}
 
@@ -523,6 +556,7 @@ public class GameAgent : MonoBehaviour {
 	private void FinishPrint()
 	{
 		numTimesPrinted++;
+		AnalyticsAgent.LogAnalyticEvent( AnalyticsAgent.AnalyticEvent.PrintFinished );
 		
 		mode = Random.Range( 0, 2 );
 		ColorAgent.AdvanceColorPack();
@@ -563,6 +597,11 @@ public class GameAgent : MonoBehaviour {
 			storeHighlight.enabled = enabled;
 
 		UpdateNavigationHighlight( enabled );
+
+		if( enabled )
+			TipAgent.ShowNextTip();
+		else
+			TipAgent.SetTipEnabled( enabled );
 	}
 
 	private void UpdateNavigationHighlight( bool canShow )
