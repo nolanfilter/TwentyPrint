@@ -6,6 +6,9 @@ public class TouchDownCallback : MonoBehaviour {
 	
 	public delegate void AreaTouch();
 	public event AreaTouch OnAreaTouch;
+
+	public delegate void AreaTouchWithCallback( TouchDownCallback callback );
+	public event AreaTouchWithCallback OnAreaTouchWithCallback;
 	
 	private RectTransform rectTransform;
 	
@@ -23,7 +26,14 @@ public class TouchDownCallback : MonoBehaviour {
 	
 	private void OnTouchDown( int fingerIndex, Vector2 fingerPos )
 	{
-		if( OnAreaTouch != null && RectTransformUtility.RectangleContainsScreenPoint( rectTransform, fingerPos, null ) )
-			OnAreaTouch();
+		if( RectTransformUtility.RectangleContainsScreenPoint( rectTransform, fingerPos, null ) )
+		{
+
+			if( OnAreaTouch != null )
+				OnAreaTouch();
+
+			if( OnAreaTouchWithCallback != null )
+				OnAreaTouchWithCallback( this );
+		}
 	}
 }

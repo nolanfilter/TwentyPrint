@@ -5,9 +5,9 @@ using System.Collections;
 public class AdAgent : MonoBehaviour {
 	
 	private const string iosInterstitialVideoZoneId = "329741430525809";
-	private const string iosIncentivizedZoneId = "329741430525828";
+	private const string iosIncentivizedVideoZoneId = "329741430525828";
 	private string interstitialVideoZoneId;
-	private string incentivizedZoneId;
+	private string incentivizedVideoZoneId;
 
 	private const string iosGameID = "32974";
 	private const string androidGameID = "33171";
@@ -40,7 +40,7 @@ public class AdAgent : MonoBehaviour {
 	{
 #if UNITY_IOS
 		interstitialVideoZoneId = iosInterstitialVideoZoneId;
-		incentivizedZoneId = iosIncentivizedZoneId;
+		incentivizedVideoZoneId = iosIncentivizedVideoZoneId;
 
 		gameID = iosGameID;
 #elif UNITY_ANDROID
@@ -109,6 +109,34 @@ public class AdAgent : MonoBehaviour {
 		else
 		{
 			GameAgent.ChangeState( GameAgent.GetAfterAdState() );
+		}
+	}
+
+	public static void ShowIncentivizedVideo()
+	{
+		if( instance )
+			instance.internalShowIncentivizedVideo();
+	}
+	
+	private void internalShowIncentivizedVideo()
+	{
+		if( Advertisement.isReady( incentivizedVideoZoneId ) )
+		{
+			Advertisement.Show( incentivizedVideoZoneId, new ShowOptions {
+				pause = true,
+				resultCallback = result => {
+					switch( result )
+					{
+						case ShowResult.Finished: SpriteAgent.UnlockSprite(); break;
+						case ShowResult.Failed: SpriteAgent.LeaveSpriteLocked(); break;
+						case ShowResult.Skipped: SpriteAgent.LeaveSpriteLocked(); break;
+					}
+				}
+			} );
+		}
+		else
+		{
+			 SpriteAgent.LeaveSpriteLocked();
 		}
 	}
 

@@ -44,9 +44,9 @@ public class ColorController : MonoBehaviour {
 	{
 		switch( uiType )
 		{
-			case UIType.UIImage: GetComponent<Image>().color = color; break;
-			case UIType.UIText: GetComponent<Text>().color = color; break;
-			case UIType.UICamera: GetComponent<Camera>().backgroundColor = color; break;
+			case UIType.UIImage: GetComponent<Image>().color = new Color( color.r, color.g, color.b, GetComponent<Image>().color.a ); break;
+			case UIType.UIText: GetComponent<Text>().color = new Color( color.r, color.g, color.b, GetComponent<Text>().color.a ); break;
+			case UIType.UICamera: GetComponent<Camera>().backgroundColor = new Color( color.r, color.g, color.b, GetComponent<Camera>().backgroundColor.a ); break;
 		}
 	}
 }

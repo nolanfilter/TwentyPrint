@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public class BoardAgent : MonoBehaviour {
 
 	//has to be odd
-	private static int mBoardWidth = 51;
+	private static int mBoardWidth = 75;
 	public static int BoardWidth
 	{
 		get
@@ -23,7 +23,7 @@ public class BoardAgent : MonoBehaviour {
 		}
 	}
 
-	public static int NumScreens = 2;
+	public static int NumScreens = 3;
 
 	public static int BoardSize
 	{
@@ -196,11 +196,13 @@ public class BoardAgent : MonoBehaviour {
 
 		float alpha = 1f;
 
+		/*
 		float relativeX = Mathf.Abs( position.x - Screen.width * 0.5f ) - Screen.width * 0.5f;
 		if( relativeX > 0f )
 		{
 			alpha = Mathf.Lerp( 0.75f, 0f, relativeX / ( (float)( NumScreens - 1 ) * 0.5f * Screen.width ) );
 		}
+		*/
 					
 		spriteRenderer.color = new Color( 1f, 1f, 1f, alpha );
 

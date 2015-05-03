@@ -19,8 +19,6 @@ public class GameAgent : MonoBehaviour {
 	}
 	private State currentState = State.Invalid;
 	private State afterAdState;
-	
-	public Sprite[] sprites;
 
 	public CanvasScaler canvasScaler; 
 	public RectTransform scrollPanelRectTransform;
@@ -37,11 +35,17 @@ public class GameAgent : MonoBehaviour {
 	public Image mainHighlight;
 	public Image storeHighlight;
 
+	public TouchDownCallback removeAdsSettingsCallback;
+	public TouchDownCallback removeAdsStoreCallback;
+	public TouchDownCallback restorePurchasesCallback;
+	public TouchDownCallback soundsCallback;
+	public TouchDownCallback supportCallback;
+	public TouchDownCallback moreCallback;
+
 	private float fillTime = 10f;
 	private float speed;
 
 	private int index = 0;
-	private int spriteIndex = 0;
 
 	private int[] deck;
 
@@ -119,6 +123,24 @@ public class GameAgent : MonoBehaviour {
 		if( shareCallback )
 			shareCallback.OnAreaTouch += OnShareAreaTouch;
 
+		if( removeAdsSettingsCallback )
+			removeAdsSettingsCallback.OnAreaTouch += OnRemoveAdsAreaTouch;
+
+		if( removeAdsStoreCallback )
+			removeAdsStoreCallback.OnAreaTouch += OnRemoveAdsAreaTouch;
+
+		if( restorePurchasesCallback )
+			restorePurchasesCallback.OnAreaTouch += OnRestorePurchasesAreaTouch;
+
+		if( soundsCallback )
+			soundsCallback.OnAreaTouch += OnSoundsAreaTouch;
+
+		if( supportCallback )
+			supportCallback.OnAreaTouch += OnSupportAreaTouch;
+
+		if( moreCallback )
+			moreCallback.OnAreaTouch += OnMoreAreaTouch;
+
 		FingerGestures.OnFingerUp += OnTouchUp;
 		FingerGestures.OnFingerLongPress += OnLongPress;
 		FingerGestures.OnFingerDoubleTap += OnDoubleTap;
@@ -131,6 +153,24 @@ public class GameAgent : MonoBehaviour {
 	{
 		if( shareCallback )
 			shareCallback.OnAreaTouch -= OnShareAreaTouch;
+
+		if( removeAdsSettingsCallback )
+			removeAdsSettingsCallback.OnAreaTouch -= OnRemoveAdsAreaTouch;
+		
+		if( removeAdsStoreCallback )
+			removeAdsStoreCallback.OnAreaTouch -= OnRemoveAdsAreaTouch;
+		
+		if( restorePurchasesCallback )
+			restorePurchasesCallback.OnAreaTouch -= OnRestorePurchasesAreaTouch;
+		
+		if( soundsCallback )
+			soundsCallback.OnAreaTouch -= OnSoundsAreaTouch;
+		
+		if( supportCallback )
+			supportCallback.OnAreaTouch -= OnSupportAreaTouch;
+        
+        if( moreCallback )
+			moreCallback.OnAreaTouch -= OnMoreAreaTouch;
 
 		FingerGestures.OnFingerUp -= OnTouchUp;
 		FingerGestures.OnFingerLongPress -= OnLongPress;
@@ -198,6 +238,31 @@ public class GameAgent : MonoBehaviour {
 
 		wasSharing = true;
 	}
+
+	private void OnRemoveAdsAreaTouch()
+	{
+
+	}
+
+	private void OnRestorePurchasesAreaTouch()
+	{
+        
+    }
+
+	private void OnSoundsAreaTouch()
+	{
+        
+    }
+
+	private void OnSupportAreaTouch()
+	{
+        
+    }
+
+	private void OnMoreAreaTouch()
+	{
+        
+    }
 
 	private void OnTouchUp( int fingerIndex, Vector2 fingerPos, float timeHeldDown )
 	{
@@ -362,6 +427,7 @@ public class GameAgent : MonoBehaviour {
 				BoardAgent.ResetBoard();
 				ShuffleDeck();
 				colorOffset = Random.Range( 0f, 360f );
+				SpriteAgent.Randomize();
 
 				index = 0;
 			} break;
@@ -459,7 +525,6 @@ public class GameAgent : MonoBehaviour {
 		numTimesPrinted++;
 		
 		mode = Random.Range( 0, 2 );
-		spriteIndex = Random.Range( 0, sprites.Length );
 		ColorAgent.AdvanceColorPack();
 		
 		ChangeState( State.Finished );
@@ -502,6 +567,9 @@ public class GameAgent : MonoBehaviour {
 
 	private void UpdateNavigationHighlight( bool canShow )
 	{
+		if( navigationImage )
+			navigationImage.enabled = ( canShow && currentScreenX == 0f );
+
 		if( settingsHighlight )
 			settingsHighlight.enabled = ( canShow && currentScreenX == Screen.width * -1f );
 		
@@ -593,7 +661,7 @@ public class GameAgent : MonoBehaviour {
 		if( BoardAgent.GetSpriteEnabled( position ) )
 			return;
 
-		BoardAgent.SetSpriteImage( position, sprites[ spriteIndex ] );
+		BoardAgent.SetSpriteImage( position, SpriteAgent.GetCurrentSprite() );
 
 		Color color = ColorAgent.GetCurrentColorPack().foregroundColor;
 

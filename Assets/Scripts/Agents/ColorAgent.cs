@@ -130,7 +130,7 @@ public class ColorAgent : MonoBehaviour {
 	{
 		colorPackIndex = (int)newType;
 		
-		//PlayerPrefs.SetInt( colorPackIndexString, colorPackIndex );
+		PlayerPrefs.SetInt( colorPackIndexString, colorPackIndex );
 	}
 
 	public static void AdvanceColorPack()
