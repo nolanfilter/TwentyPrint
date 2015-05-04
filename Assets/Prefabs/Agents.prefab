@@ -2873,9 +2873,9 @@ MonoBehaviour:
   - {fileID: 21300000, guid: e7b1c32e56cfe4b4ea21b362b41f4119, type: 3}
   - {fileID: 21300000, guid: dbd4cc6a7242a4260bb88e2b2ff6bd1f, type: 3}
   - {fileID: 21300000, guid: 43c2f4dd30dd740edbb457b00867b956, type: 3}
+  - {fileID: 21300000, guid: 8f3f9e1ee050845ae97e74a6f81bbc1f, type: 3}
   - {fileID: 21300000, guid: a28d9d1ea051b42459218d59b44333ed, type: 3}
   - {fileID: 21300000, guid: 91e381735117a44d8862f788f971434d, type: 3}
-  - {fileID: 21300000, guid: 6e610d0d4ac534322914864ade611ef2, type: 3}
   - {fileID: 21300000, guid: c211abedc8149437d9fe9a10053dcf50, type: 3}
   - {fileID: 21300000, guid: 7a4dd5ba6499b4b24b593e5d26b82a90, type: 3}
   - {fileID: 21300000, guid: 5b42bcc019a524bb29d534f45fdc07f7, type: 3}
@@ -2887,7 +2887,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 7e42408e5226e45e6b88128493ce53d8, type: 3}
   - {fileID: 21300000, guid: 71a91e9c694204c8884618c826a7bd68, type: 3}
   - {fileID: 21300000, guid: ae2c5045626cc41399a0a0776ce962f7, type: 3}
-  - {fileID: 21300000, guid: 7733bb226905846f1957b0e46cb2e8ee, type: 3}
+  - {fileID: 21300000, guid: 6e610d0d4ac534322914864ade611ef2, type: 3}
   freeSprites:
   - _0000_Truchet1
   - _0001_Truchet2
