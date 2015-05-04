@@ -15,6 +15,9 @@ public class AdAgent : MonoBehaviour {
 
 	private bool hasIAd = false;
 
+	private int numFreePrints = 10;
+	private int adSchedule = 3;
+
 	private static AdAgent mInstance;
 	public static AdAgent instance
 	{
@@ -71,7 +74,7 @@ public class AdAgent : MonoBehaviour {
 
 	private void internalShowInterstitialImage()
 	{
-		if( hasIAd )
+		if( IsTimeForAnAd() && hasIAd )
 		{
 			iAdBannerController.instance.ShowInterstitialAd();
 
@@ -156,5 +159,10 @@ public class AdAgent : MonoBehaviour {
 			yield return null;
 
 		iAdBannerController.instance.LoadInterstitialAd();
+	}
+
+	private bool IsTimeForAnAd()
+	{
+		return ( ( AnalyticsAgent.GetNumPrints() - numFreePrints )%adSchedule == 0 );
 	}
 }

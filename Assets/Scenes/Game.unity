@@ -126,6 +126,18 @@ Prefab:
       propertyPath: m_RootOrder
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 2008606, guid: 8c9b814b9bd33413a80f8e1293502c9f, type: 2}
+      propertyPath: m_BackGroundColor.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2008606, guid: 8c9b814b9bd33413a80f8e1293502c9f, type: 2}
+      propertyPath: m_BackGroundColor.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2008606, guid: 8c9b814b9bd33413a80f8e1293502c9f, type: 2}
+      propertyPath: m_BackGroundColor.b
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 8c9b814b9bd33413a80f8e1293502c9f, type: 2}
   m_IsPrefabParent: 0
@@ -171,7 +183,7 @@ Prefab:
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 96f4356a25e065446a6e8c4500a99fa0, type: 2}
   m_IsPrefabParent: 0
---- !u!1001 &1463121263
+--- !u!1001 &1723031129
 Prefab:
   m_ObjectHideFlags: 0
   serializedVersion: 2

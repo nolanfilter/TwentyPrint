@@ -1,9 +1,7 @@
 ﻿using UnityEngine;
-using UnityEngine.iOS;
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
-using UnionAssets.FLE;
 
 public class GameAgent : MonoBehaviour {
 	
@@ -94,20 +92,6 @@ public class GameAgent : MonoBehaviour {
 
 	void Start()
 	{
-		UnityEngine.iOS.NotificationServices.RegisterForNotifications( NotificationType.Alert | NotificationType.Badge | NotificationType.Sound );
-
-		//IOSNotificationController.instance.RequestNotificationPermissions();
-
-		/*
-		IOSNotificationController.instance.OnNotificationScheduleResult += OnNotificationScheduleResult;
-
-		IOSNotificationController.instance.ScheduleNotification (5, "Your Notification Text No Sound", false);
-		*/
-
-		IOSNotificationController.instance.RegisterForRemoteNotifications( NotificationType.Alert | NotificationType.Badge | NotificationType.Sound );
-
-		IOSNotificationController.instance.addEventListener( IOSNotificationController.DEVICE_TOKEN_RECEIVED, OnTokenReceived );
-
 		if( canvasScaler )
 			widthRatio = canvasScaler.referenceResolution.x / Screen.width;
 
@@ -210,38 +194,6 @@ public class GameAgent : MonoBehaviour {
 		GUI.Label( new Rect( 10f, 10f, 1000f, 1000f ), "" + currentState );
 	}
 	*/
-
-	private void OnNotificationScheduleResult( ISN_Result res ) {
-		IOSNotificationController.instance.OnNotificationScheduleResult -= OnNotificationScheduleResult;
-		string msg = string.Empty;
-		if(res.IsSucceeded) {
-			msg += "Notification was successfully scheduled \n allowed notifications types: \n";
-			if((IOSNotificationController.AllowedNotificationsType & IOSUIUserNotificationType.Alert) != 0) {
-				msg += "Alert ";
-			}
-			if((IOSNotificationController.AllowedNotificationsType & IOSUIUserNotificationType.Sound) != 0) {
-				msg += "Sound ";
-			}
-			if((IOSNotificationController.AllowedNotificationsType & IOSUIUserNotificationType.Badge) != 0) {
-				msg += "Badge ";
-			}
-		} else {
-			msg += "Notification scheduling failed";
-		}
-		
-		IOSMessage.Create("On Notification Schedule Result", msg);
-	}
-
-	private void OnTokenReceived( CEvent e )
-	{
-		IOSNotificationDeviceToken token = e.data as IOSNotificationDeviceToken;
-		
-		Debug.Log( "OnTokenReceived" );
-		
-		Debug.Log( token.tokenString );
-
-		IOSNotificationController.instance.removeEventListener( IOSNotificationController.DEVICE_TOKEN_RECEIVED, OnTokenReceived );
-	}
 
 	private void OnShareAreaTouch()
 	{
@@ -402,6 +354,8 @@ public class GameAgent : MonoBehaviour {
 				scrollPanelRectTransform.transform.localPosition += Vector3.right * delta.x * widthRatio;
 		}
 
+		UpdateNavigationHighlight( true );
+
 		dragDeltaX = delta.x;
 	}
 	
@@ -432,6 +386,14 @@ public class GameAgent : MonoBehaviour {
 			return instance.afterAdState;
 		
 		return State.Invalid;
+	}
+
+	public static bool GetWasDragging()
+	{
+		if( instance )
+			return instance.wasDragging;
+
+		return false;
 	}
 
 	public static void ChangeState( State newState )
@@ -477,6 +439,7 @@ public class GameAgent : MonoBehaviour {
 				
 			case State.Paused:
 			{				
+				TipAgent.ShowNextTip();
 				SetShareEnabled( true );
 				
 				speed = 0f;
@@ -494,6 +457,7 @@ public class GameAgent : MonoBehaviour {
 				
 			case State.Finished:
 			{
+				TipAgent.ShowNextTip();
 				SetShareEnabled( true );
 			} break;
 				
@@ -597,17 +561,14 @@ public class GameAgent : MonoBehaviour {
 			storeHighlight.enabled = enabled;
 
 		UpdateNavigationHighlight( enabled );
-
-		if( enabled )
-			TipAgent.ShowNextTip();
-		else
-			TipAgent.SetTipEnabled( enabled );
 	}
 
 	private void UpdateNavigationHighlight( bool canShow )
 	{
+		TipAgent.SetTipEnabled( canShow && CameraAgent.MainCameraObject.transform.localPosition.x == 0f  );
+
 		if( navigationImage )
-			navigationImage.enabled = ( canShow && currentScreenX == 0f );
+			navigationImage.enabled = ( canShow && CameraAgent.MainCameraObject.transform.localPosition.x == 0f );
 
 		if( settingsHighlight )
 			settingsHighlight.enabled = ( canShow && currentScreenX == Screen.width * -1f );
@@ -657,7 +618,10 @@ public class GameAgent : MonoBehaviour {
 		UpdateNavigationHighlight( true );
 
 		if( currentState == State.Ready && currentScreenX == 0f )
+		{
 			SetShareEnabled( false );
+			TipAgent.SetTipEnabled( true );
+		}
 	}
 
 	private IEnumerator DoPrint()

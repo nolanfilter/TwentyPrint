@@ -9,6 +9,7 @@ public class AnalyticsAgent : MonoBehaviour {
 	}
 
 	private int numPrints = 0;
+	private string lifetimePrintsString = "LifetimePrints";
 
 	private static AnalyticsAgent mInstance;
 	public static AnalyticsAgent instance
@@ -29,6 +30,9 @@ public class AnalyticsAgent : MonoBehaviour {
 		}
 		
 		mInstance = this;
+
+		if( PlayerPrefs.HasKey( lifetimePrintsString ) )
+			numPrints = PlayerPrefs.GetInt( lifetimePrintsString );
 	}
 
 	public static void LogAnalyticEvent( AnalyticEvent analyticEvent )
