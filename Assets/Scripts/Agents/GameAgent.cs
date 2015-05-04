@@ -24,7 +24,9 @@ public class GameAgent : MonoBehaviour {
 	public TouchDownCallback shareCallback;
 	public Text shareText;
 	public Image shareImage;
-	
+
+	private string shareCopy = "Look what I made! Make something cool with 20print! https://itunes.apple.com/us/app/20print/id900236159?mt=8";
+
 	public Image navigationImage;
 	public Image settingsIndent;
 	public Image mainIndent;
@@ -59,6 +61,8 @@ public class GameAgent : MonoBehaviour {
 
 	private float navigationDuration = 0.2f;
 	private float currentScreenX = 0f;
+	private float targetScreenX = 0f;
+
 	private float widthRatio = 1f;
 	private float dragBeginX;
 	private float dragDeltaX = 0f;
@@ -338,21 +342,23 @@ public class GameAgent : MonoBehaviour {
 				StopCoroutine( "DoNavigation" );
 
 				wasDragging = true;
+
+				targetScreenX = CameraAgent.MainCameraObject.transform.localPosition.x;
+				StartCoroutine( "DoDragNavigation" );
 			}
 
 			if( !wasDragging )
 				return;
 		}
 
-		float absPosition = Mathf.Abs( CameraAgent.MainCameraObject.transform.localPosition.x - delta.x );
+		float newPosition = targetScreenX - delta.x;
+
+		float absPosition = Mathf.Abs( newPosition );
 
 		if( absPosition < Screen.width * 1.5f )
-		{
-			CameraAgent.MainCameraObject.transform.localPosition -= Vector3.right * delta.x;
-
-			if( scrollPanelRectTransform )
-				scrollPanelRectTransform.transform.localPosition += Vector3.right * delta.x * widthRatio;
-		}
+			targetScreenX = newPosition;
+		else
+			targetScreenX = Screen.width * 1.5f * Mathf.Sign( newPosition );
 
 		UpdateNavigationHighlight( true );
 
@@ -367,6 +373,7 @@ public class GameAgent : MonoBehaviour {
 			currentScreenX = Mathf.Round( CameraAgent.MainCameraObject.transform.localPosition.x / Screen.width ) * Screen.width;
 
 		currentScreenX = Mathf.Clamp( currentScreenX, Screen.width * -1f, Screen.width );
+		StopCoroutine( "DoDragNavigation" );
 		StartCoroutine( "DoNavigation", Vector3.right * currentScreenX );
 
 		wasDragging = false;
@@ -580,6 +587,19 @@ public class GameAgent : MonoBehaviour {
 			storeHighlight.enabled = ( canShow && currentScreenX == Screen.width );
 	}
 
+	private IEnumerator DoDragNavigation()
+	{
+		while( wasDragging || CameraAgent.MainCameraObject.transform.localPosition.x != targetScreenX )
+		{
+			CameraAgent.MainCameraObject.transform.localPosition = Vector3.right * Mathf.Lerp( CameraAgent.MainCameraObject.transform.localPosition.x, targetScreenX, 0.5f );
+
+			if( scrollPanelRectTransform )
+				scrollPanelRectTransform.transform.localPosition = CameraAgent.MainCameraObject.transform.localPosition * widthRatio * -1f;
+
+			yield return null;
+		}
+	}
+
 	private IEnumerator DoNavigation( Vector3 toPosition )
 	{
 		if( currentState == State.Printing )
@@ -588,32 +608,29 @@ public class GameAgent : MonoBehaviour {
 		Vector3 fromPosition = CameraAgent.MainCameraObject.transform.localPosition;
 		float currentTime = 0f;
 		float lerp;
-		Vector3 relativeFromPosition = Vector3.zero;
-		Vector3 relativeToPosition = Vector3.zero;
-
-		if( scrollPanelRectTransform )
-		{
-			relativeFromPosition = scrollPanelRectTransform.transform.localPosition;
-			relativeToPosition = new Vector3( toPosition.x * widthRatio * -1f, scrollPanelRectTransform.transform.localPosition.y, scrollPanelRectTransform.transform.localPosition.z );
-		}
 
 		do
 		{
 			currentTime += Time.deltaTime;
 			lerp = Mathf.Clamp01( currentTime / navigationDuration );
 
-			lerp = 3f * Mathf.Pow( lerp, 2f ) - 2f * Mathf.Pow( lerp, 3f );
+			lerp = Mathf.Pow( lerp, 0.5f );
+
+			//lerp = 3f * Mathf.Pow( lerp, 2f ) - 2f * Mathf.Pow( lerp, 3f );
 
 			CameraAgent.MainCameraObject.transform.localPosition = Vector3.Lerp( fromPosition, toPosition, lerp );
 
 			if( scrollPanelRectTransform )
-				scrollPanelRectTransform.transform.localPosition = Vector3.Lerp( relativeFromPosition, relativeToPosition, lerp );
+				scrollPanelRectTransform.transform.localPosition = CameraAgent.MainCameraObject.transform.localPosition * widthRatio * -1f;
 
 			yield return null;
 
 		} while( currentTime < navigationDuration );
 
 		CameraAgent.MainCameraObject.transform.localPosition = toPosition;
+
+		if( scrollPanelRectTransform )
+			scrollPanelRectTransform.transform.localPosition = CameraAgent.MainCameraObject.transform.localPosition * widthRatio * -1f;
 
 		UpdateNavigationHighlight( true );
 
@@ -656,7 +673,7 @@ public class GameAgent : MonoBehaviour {
 		
 		yield return null;
 
-		IOSSocialManager.instance.ShareMedia( "Check this rad print!", ScreenshotAgent.GetTexture() );
+		IOSSocialManager.instance.ShareMedia( shareCopy, ScreenshotAgent.GetTexture() );
 	}
 
 	private void ActivateSprite( Vector2 position )
