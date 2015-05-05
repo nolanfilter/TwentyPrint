@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Cloud.Analytics;
 using System.Collections;
 
 public class AnalyticsAgent : MonoBehaviour {
@@ -10,6 +11,8 @@ public class AnalyticsAgent : MonoBehaviour {
 
 	private int numPrints = 0;
 	private string lifetimePrintsString = "LifetimePrints";
+
+	private const string projectId = "666c8c0f-582f-4219-a39b-e55e36cd4702";
 
 	private static AnalyticsAgent mInstance;
 	public static AnalyticsAgent instance
@@ -33,6 +36,8 @@ public class AnalyticsAgent : MonoBehaviour {
 
 		if( PlayerPrefs.HasKey( lifetimePrintsString ) )
 			numPrints = PlayerPrefs.GetInt( lifetimePrintsString );
+
+		UnityAnalytics.StartSDK (projectId);
 	}
 
 	public static void LogAnalyticEvent( AnalyticEvent analyticEvent )
@@ -45,6 +50,19 @@ public class AnalyticsAgent : MonoBehaviour {
 	{
 		if( analyticEvent == AnalyticEvent.PrintFinished )
 			numPrints++;
+	}
+
+	public static void LogTranscation( IOSStoreKitResponse response )
+	{
+		if( instance )
+			instance.internalLogTranscation( response );
+	}
+
+	private void internalLogTranscation( IOSStoreKitResponse response )
+	{
+		IOSProductTemplate product = IAPAgent.GetProductById( response.productIdentifier );
+
+		UnityAnalytics.Transaction( response.productIdentifier, decimal.Parse( product.localizedPrice ), product.currencyCode, response.receipt, null );
 	}
 
 	public static int GetNumPrints()

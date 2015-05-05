@@ -25,7 +25,7 @@ public class GameAgent : MonoBehaviour {
 	public Text shareText;
 	public Image shareImage;
 
-	private string shareCopy = "Look what I made! Make something cool with 20print! https://itunes.apple.com/us/app/20print/id900236159?mt=8";
+	private string shareCopy = "Look what I made! Make something cool with #20print! https://itunes.apple.com/us/app/20print/id900236159?mt=8";
 
 	public Image navigationImage;
 	public Image settingsIndent;

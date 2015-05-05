@@ -74,6 +74,11 @@ public class IAPAgent : MonoBehaviour {
 		return false;
 	}
 
+	public static IOSProductTemplate GetProductById( string productIdentifier )
+	{
+		return IOSInAppPurchaseManager.instance.GetProductById( productIdentifier );
+	}
+
 	private static void OnStoreKitInitComplete( ISN_Result result )
 	{
 		IOSInAppPurchaseManager.instance.OnStoreKitInitComplete -= OnStoreKitInitComplete;
@@ -109,6 +114,8 @@ public class IAPAgent : MonoBehaviour {
 				{
 					if( instance )
 						instance.RemoveAds();
+
+					AnalyticsAgent.LogTranscation( response );
 				}
 			} break;
 
