@@ -277,6 +277,7 @@ GameObject:
   - 114: {fileID: 11480424}
   - 114: {fileID: 11420034}
   - 114: {fileID: 11492668}
+  - 114: {fileID: 11411532}
   m_Layer: 0
   m_Name: Agents
   m_TagString: Untagged
@@ -3294,6 +3295,17 @@ MonoBehaviour:
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
+--- !u!114 &11411532
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 107724}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d28c55fbfc19645c9abcb2dfb81cbbfe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &11412372
 MonoBehaviour:
   m_ObjectHideFlags: 1
