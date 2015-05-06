@@ -183,7 +183,7 @@ Prefab:
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 96f4356a25e065446a6e8c4500a99fa0, type: 2}
   m_IsPrefabParent: 0
---- !u!1001 &1723031129
+--- !u!1001 &1532116101
 Prefab:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -229,21 +229,6 @@ Prefab:
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 005a3bc5084ed416dbccdde1d842328f, type: 2}
   m_IsPrefabParent: 0
---- !u!1 &1723031130 stripped
-GameObject:
-  m_PrefabParentObject: {fileID: 107724, guid: 005a3bc5084ed416dbccdde1d842328f, type: 2}
-  m_PrefabInternal: {fileID: 1723031129}
---- !u!114 &1723031131
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1723031130}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d28c55fbfc19645c9abcb2dfb81cbbfe, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!20 &1748917645 stripped
 Camera:
   m_PrefabParentObject: {fileID: 2008606, guid: 8c9b814b9bd33413a80f8e1293502c9f,

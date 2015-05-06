@@ -270,14 +270,15 @@ GameObject:
   - 114: {fileID: 11440760}
   - 114: {fileID: 11405046}
   - 114: {fileID: 11409170}
+  - 114: {fileID: 11460030}
+  - 114: {fileID: 11492668}
+  - 114: {fileID: 11400768}
   - 114: {fileID: 11459104}
   - 114: {fileID: 11497202}
   - 114: {fileID: 11491678}
-  - 114: {fileID: 11400768}
-  - 114: {fileID: 11480424}
   - 114: {fileID: 11420034}
-  - 114: {fileID: 11492668}
   - 114: {fileID: 11411532}
+  - 114: {fileID: 11480424}
   m_Layer: 0
   m_Name: Agents
   m_TagString: Untagged
@@ -3795,10 +3796,8 @@ MonoBehaviour:
   removeAdsSettingsCallback: {fileID: 11427802}
   removeAdsStoreCallback: {fileID: 11401234}
   restorePurchasesCallback: {fileID: 11456776}
-  soundsCallback: {fileID: 11485978}
   supportCallback: {fileID: 11471024}
   moreCallback: {fileID: 11440034}
-  soundsText: {fileID: 11433662}
 --- !u!114 &11423074
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -5397,6 +5396,25 @@ MonoBehaviour:
     m_VerticalOverflow: 1
     m_LineSpacing: 1
   m_Text: Tap and hold to fast forward a Print!
+--- !u!114 &11460030
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 107724}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b8e2ccb73fd7426b88a6574b843dace, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  soundsCallback: {fileID: 11485978}
+  soundsText: {fileID: 11433662}
+  printAudioClips:
+  - {fileID: 8300000, guid: f2ed388c95bcd4e9f924ff08c33115f5, type: 3}
+  - {fileID: 8300000, guid: 1c0a9940368ca4622844be6535c9d45c, type: 3}
+  - {fileID: 8300000, guid: fa52cfe22d19441609daa96ba0a999db, type: 3}
+  buttonTapAudioClip: {fileID: 8300000, guid: 917ae3eee3e9943eaa42ac8442ed467d, type: 3}
+  swipeAudioClip: {fileID: 8300000, guid: d054fcc1334674a00bc411bb5ae02333, type: 3}
 --- !u!114 &11460800
 MonoBehaviour:
   m_ObjectHideFlags: 1

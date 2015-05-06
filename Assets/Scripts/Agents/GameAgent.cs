@@ -38,11 +38,8 @@ public class GameAgent : MonoBehaviour {
 	public TouchDownCallback removeAdsSettingsCallback;
 	public TouchDownCallback removeAdsStoreCallback;
 	public TouchDownCallback restorePurchasesCallback;
-	public TouchDownCallback soundsCallback;
 	public TouchDownCallback supportCallback;
 	public TouchDownCallback moreCallback;
-
-	public Text soundsText;
 
 	private float fillTime = 10f;
 	private float speed;
@@ -122,9 +119,6 @@ public class GameAgent : MonoBehaviour {
 		if( restorePurchasesCallback )
 			restorePurchasesCallback.OnAreaTouch += OnRestorePurchasesAreaTouch;
 
-		if( soundsCallback )
-			soundsCallback.OnAreaTouch += OnSoundsAreaTouch;
-
 		if( supportCallback )
 			supportCallback.OnAreaTouch += OnSupportAreaTouch;
 
@@ -152,9 +146,6 @@ public class GameAgent : MonoBehaviour {
 		
 		if( restorePurchasesCallback )
 			restorePurchasesCallback.OnAreaTouch -= OnRestorePurchasesAreaTouch;
-		
-		if( soundsCallback )
-			soundsCallback.OnAreaTouch -= OnSoundsAreaTouch;
 		
 		if( supportCallback )
 			supportCallback.OnAreaTouch -= OnSupportAreaTouch;
@@ -214,17 +205,6 @@ public class GameAgent : MonoBehaviour {
 	private void OnRestorePurchasesAreaTouch()
 	{
 		IAPAgent.RestorePurchases();
-    }
-
-	private void OnSoundsAreaTouch()
-	{
-		if( soundsText )
-		{
-			if( soundsText.text == "Sounds off" )
-				soundsText.text = "Sounds on";
-			else if( soundsText.text == "Sounds on" )
-				soundsText.text = "Sounds off";
-		}
     }
 
 	private void OnSupportAreaTouch()
