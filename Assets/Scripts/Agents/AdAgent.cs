@@ -154,7 +154,8 @@ public class AdAgent : MonoBehaviour {
 		}
 		else
 		{
-			 SpriteAgent.DidNotWatchAd();
+			IOSNativePopUpManager.showMessage( "Gazoinksbo!", "The ad garden is empty!\nTry again later.", "I will!");
+			SpriteAgent.DidNotWatchAd();
 		}
 	}
 

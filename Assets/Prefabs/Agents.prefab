@@ -2956,6 +2956,7 @@ MonoBehaviour:
   - {fileID: 11445654}
   - {fileID: 11473064}
   - {fileID: 11463552}
+  instructionText: {fileID: 11475990}
 --- !u!114 &11405302
 MonoBehaviour:
   m_ObjectHideFlags: 1

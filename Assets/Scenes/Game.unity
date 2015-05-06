@@ -138,6 +138,14 @@ Prefab:
       propertyPath: m_BackGroundColor.b
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 2008606, guid: 8c9b814b9bd33413a80f8e1293502c9f, type: 2}
+      propertyPath: m_ClearFlags
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2008606, guid: 8c9b814b9bd33413a80f8e1293502c9f, type: 2}
+      propertyPath: m_CullingMask.m_Bits
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 8c9b814b9bd33413a80f8e1293502c9f, type: 2}
   m_IsPrefabParent: 0

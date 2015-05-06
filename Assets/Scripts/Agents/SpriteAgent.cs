@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -8,6 +9,7 @@ public class SpriteAgent : MonoBehaviour {
 	public string[] freeSprites;
 	public StoreSpriteController[] storeSpriteControllers;
 	public TouchDownCallback[] callbacks;
+	public Text instructionText;
 
 	private int spriteIndex = 0;
 	private string spriteIndexString = "SpriteIndex";
@@ -75,6 +77,8 @@ public class SpriteAgent : MonoBehaviour {
 				}
 			}
 		}
+
+		CheckAllSpritesUnlocked();
 
 		if( !PlayerPrefs.HasKey( spriteIndexString ) )
 			PlayerPrefs.SetInt( spriteIndexString, 0 );
@@ -186,6 +190,9 @@ public class SpriteAgent : MonoBehaviour {
 			UnlockSprite( i );
 
 		PreferencesAgent.UpdateICloud();
+
+		if( instructionText )
+			instructionText.enabled = false;
 	}
 
 	public static void WatchedAd()
@@ -232,6 +239,8 @@ public class SpriteAgent : MonoBehaviour {
 		SetSpriteIndex( spriteIndexToUnlock );
 
 		PreferencesAgent.UpdateICloud();
+
+		CheckAllSpritesUnlocked();
 	}
 
 	private void UnlockSprite( int spriteIndexToUnlock )
@@ -249,5 +258,19 @@ public class SpriteAgent : MonoBehaviour {
 		storeSpriteControllers[ spriteIndexToUnlock ].sprite.color = new Color( storeSpriteControllers[ spriteIndexToUnlock ].sprite.color.r, storeSpriteControllers[ spriteIndexToUnlock ].sprite.color.g, storeSpriteControllers[ spriteIndexToUnlock ].sprite.color.b, 1f );
 		storeSpriteControllers[ spriteIndexToUnlock ].background.color = new Color( storeSpriteControllers[ spriteIndexToUnlock ].background.color.r, storeSpriteControllers[ spriteIndexToUnlock ].background.color.g, storeSpriteControllers[ spriteIndexToUnlock ].background.color.b, 1f );
 		storeSpriteControllers[ spriteIndexToUnlock ].outline.color = new Color( storeSpriteControllers[ spriteIndexToUnlock ].outline.color.r, storeSpriteControllers[ spriteIndexToUnlock ].outline.color.g, storeSpriteControllers[ spriteIndexToUnlock ].outline.color.b, 1f );
+	}
+
+	private void CheckAllSpritesUnlocked()
+	{
+		for( int i = 0; i < sprites.Length; i++ )
+		{
+			string name = sprites[i].name;
+
+			if( spritesUnlocked.ContainsKey( name ) && !spritesUnlocked[ name ] )
+				return;
+		}
+
+		if( instructionText )
+			instructionText.enabled = false;
 	}
 }

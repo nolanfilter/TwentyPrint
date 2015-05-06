@@ -87,6 +87,8 @@ public class GameAgent : MonoBehaviour {
 		}
 		
 		mInstance = this;
+
+		Application.targetFrameRate = 60;
 	}
 
 	void Start()
@@ -341,7 +343,7 @@ public class GameAgent : MonoBehaviour {
 
 		currentScreenX = Mathf.Clamp( currentScreenX, Screen.width * -1f, Screen.width );
 		StopCoroutine( "DoDragNavigation" );
-		StartCoroutine( "DoNavigation", Vector3.right * currentScreenX );
+		StartCoroutine( "DoNavigation", currentScreenX );
 
 		wasDragging = false;
 	}
@@ -542,10 +544,10 @@ public class GameAgent : MonoBehaviour {
 
 	private void UpdateNavigationHighlight( bool canShow )
 	{
-		TipAgent.SetTipEnabled( canShow && CameraAgent.MainCameraObject.transform.localPosition.x == 0f  );
+		TipAgent.SetTipEnabled( canShow && CameraAgent.MainCameraObject.transform.localPosition.x == 0f && !wasDragging );
 
 		if( navigationImage )
-			navigationImage.enabled = ( canShow && CameraAgent.MainCameraObject.transform.localPosition.x == 0f );
+			navigationImage.enabled = ( canShow && CameraAgent.MainCameraObject.transform.localPosition.x == 0f && !wasDragging );
 
 		if( settingsHighlight )
 			settingsHighlight.enabled = ( canShow && currentScreenX == Screen.width * -1f );
@@ -561,21 +563,18 @@ public class GameAgent : MonoBehaviour {
 	{
 		while( wasDragging || CameraAgent.MainCameraObject.transform.localPosition.x != targetScreenX )
 		{
-			CameraAgent.MainCameraObject.transform.localPosition = Vector3.right * Mathf.Lerp( CameraAgent.MainCameraObject.transform.localPosition.x, targetScreenX, 0.5f );
-
-			if( scrollPanelRectTransform )
-				scrollPanelRectTransform.transform.localPosition = CameraAgent.MainCameraObject.transform.localPosition * widthRatio * -1f;
+			SetCameraX( Mathf.Lerp( CameraAgent.MainCameraObject.transform.localPosition.x, targetScreenX, 0.5f ) );
 
 			yield return null;
 		}
 	}
 
-	private IEnumerator DoNavigation( Vector3 toPosition )
+	private IEnumerator DoNavigation( float toX )
 	{
 		if( currentState == State.Printing )
 			ChangeState( State.Paused );
 
-		Vector3 fromPosition = CameraAgent.MainCameraObject.transform.localPosition;
+		float fromX = CameraAgent.MainCameraObject.transform.localPosition.x;
 		float currentTime = 0f;
 		float lerp;
 
@@ -588,19 +587,13 @@ public class GameAgent : MonoBehaviour {
 
 			//lerp = 3f * Mathf.Pow( lerp, 2f ) - 2f * Mathf.Pow( lerp, 3f );
 
-			CameraAgent.MainCameraObject.transform.localPosition = Vector3.Lerp( fromPosition, toPosition, lerp );
-
-			if( scrollPanelRectTransform )
-				scrollPanelRectTransform.transform.localPosition = CameraAgent.MainCameraObject.transform.localPosition * widthRatio * -1f;
+			SetCameraX( Mathf.Lerp( fromX, toX, lerp ) );
 
 			yield return null;
 
 		} while( currentTime < navigationDuration );
 
-		CameraAgent.MainCameraObject.transform.localPosition = toPosition;
-
-		if( scrollPanelRectTransform )
-			scrollPanelRectTransform.transform.localPosition = CameraAgent.MainCameraObject.transform.localPosition * widthRatio * -1f;
+		SetCameraX( toX );
 
 		UpdateNavigationHighlight( true );
 
@@ -681,5 +674,13 @@ public class GameAgent : MonoBehaviour {
 			deck[i] = deck[randomValue];
 			deck[randomValue] = temp;
 		}
+	}
+
+	private void SetCameraX( float x )
+	{
+		CameraAgent.MainCameraObject.transform.localPosition = Vector3.right * Mathf.Round( x );
+
+		if( scrollPanelRectTransform )
+			scrollPanelRectTransform.transform.localPosition = CameraAgent.MainCameraObject.transform.localPosition * widthRatio * -1f;
 	}
 }

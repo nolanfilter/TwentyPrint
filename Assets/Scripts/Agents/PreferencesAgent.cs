@@ -81,6 +81,8 @@ public class PreferencesAgent : MonoBehaviour {
 
 	public static void UpdateICloud()
 	{
+		//IOSNativePopUpManager.showMessage(spriteStatusString, "setting value");
+
 		iCloudManager.instance.setString( spriteStatusString, DictionaryToString( SpriteAgent.GetSpritesUnlockedDictionary() ) );
 	}
 
