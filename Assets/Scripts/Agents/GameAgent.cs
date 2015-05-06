@@ -34,9 +34,7 @@ public class GameAgent : MonoBehaviour {
 	public Image settingsHighlight;
 	public Image mainHighlight;
 	public Image storeHighlight;
-
-	public TouchDownCallback removeAdsSettingsCallback;
-	public TouchDownCallback removeAdsStoreCallback;
+	
 	public TouchDownCallback restorePurchasesCallback;
 	public TouchDownCallback supportCallback;
 	public TouchDownCallback moreCallback;
@@ -52,7 +50,7 @@ public class GameAgent : MonoBehaviour {
 	
 	private int numTimesPrinted = 0;
 
-	private int mode = 0;
+	private int mode = 1;
 
 	private int offscreenWidth;
 
@@ -110,12 +108,6 @@ public class GameAgent : MonoBehaviour {
 		if( shareCallback )
 			shareCallback.OnAreaTouch += OnShareAreaTouch;
 
-		if( removeAdsSettingsCallback )
-			removeAdsSettingsCallback.OnAreaTouch += OnRemoveAdsAreaTouch;
-
-		if( removeAdsStoreCallback )
-			removeAdsStoreCallback.OnAreaTouch += OnRemoveAdsAreaTouch;
-
 		if( restorePurchasesCallback )
 			restorePurchasesCallback.OnAreaTouch += OnRestorePurchasesAreaTouch;
 
@@ -137,12 +129,6 @@ public class GameAgent : MonoBehaviour {
 	{
 		if( shareCallback )
 			shareCallback.OnAreaTouch -= OnShareAreaTouch;
-
-		if( removeAdsSettingsCallback )
-			removeAdsSettingsCallback.OnAreaTouch -= OnRemoveAdsAreaTouch;
-		
-		if( removeAdsStoreCallback )
-			removeAdsStoreCallback.OnAreaTouch -= OnRemoveAdsAreaTouch;
 		
 		if( restorePurchasesCallback )
 			restorePurchasesCallback.OnAreaTouch -= OnRestorePurchasesAreaTouch;
@@ -195,11 +181,6 @@ public class GameAgent : MonoBehaviour {
 		StartCoroutine( "DoShare" );
 
 		wasSharing = true;
-	}
-
-	private void OnRemoveAdsAreaTouch()
-	{
-		IAPAgent.PurchaseRemoveAds();
 	}
 
 	private void OnRestorePurchasesAreaTouch()
@@ -290,6 +271,7 @@ public class GameAgent : MonoBehaviour {
 		if( ( currentState == State.Printing || currentState == State.Paused ) && CameraAgent.MainCameraObject.transform.localPosition.x == 0f )
 		{
 			StopCoroutine( "DoPrint" );
+			AudioAgent.StopSoundEffect( AudioAgent.SoundEffectType.Print );
 
 			while( index < BoardAgent.BoardSize )
 			{
@@ -297,7 +279,7 @@ public class GameAgent : MonoBehaviour {
 				
 				index++;
 			}
-			
+
 			FinishPrint();
 		}
 	}
@@ -348,9 +330,14 @@ public class GameAgent : MonoBehaviour {
 	private void OnDragUp( int fingerIndex, Vector2 fingerPos )
 	{
 		if( Mathf.Abs( dragDeltaX ) > swipeThreshold )
+		{
 			currentScreenX -= Screen.width * Mathf.Sign( dragDeltaX );
+			AudioAgent.PlaySoundEffect( AudioAgent.SoundEffectType.Swipe );
+		}
 		else
+		{
 			currentScreenX = Mathf.Round( CameraAgent.MainCameraObject.transform.localPosition.x / Screen.width ) * Screen.width;
+		}
 
 		currentScreenX = Mathf.Clamp( currentScreenX, Screen.width * -1f, Screen.width );
 		StopCoroutine( "DoDragNavigation" );
@@ -402,9 +389,7 @@ public class GameAgent : MonoBehaviour {
 			{
 				SetShareEnabled( false );
 
-				ColorAgent.UpdateColor( ColorAgent.ColorType.Foreground );
-				ColorAgent.UpdateColor( ColorAgent.ColorType.Background );
-				ColorAgent.UpdateColor( ColorAgent.ColorType.Mid );
+				ColorAgent.AdvanceColorPack();
 
 				BoardAgent.ResetBoard();
 				ShuffleDeck();
@@ -420,6 +405,9 @@ public class GameAgent : MonoBehaviour {
 			
 				speed = (float)BoardAgent.BoardSize / fillTime;
 
+				AudioAgent.PlaySoundEffect( AudioAgent.SoundEffectType.Print, fillTime );
+				AudioAgent.PitchSoundEffect( AudioAgent.SoundEffectType.Print, 1f );
+
 				if( index == 0 )
 					StartCoroutine( "DoPrint" );
 			} break;
@@ -430,7 +418,8 @@ public class GameAgent : MonoBehaviour {
 				SetShareEnabled( true );
 				
 				speed = 0f;
-				
+
+				AudioAgent.PauseSoundEffect( AudioAgent.SoundEffectType.Print );
 			} break;
 				
 			case State.FastForwarding:
@@ -438,6 +427,8 @@ public class GameAgent : MonoBehaviour {
 				SetShareEnabled( false );
 				
 				speed = (float)BoardAgent.BoardSize / fillTime * 5f;
+
+				AudioAgent.PitchSoundEffect( AudioAgent.SoundEffectType.Print, 2f );
 
 				wasFastForwarding = true;
 			} break;
@@ -509,9 +500,8 @@ public class GameAgent : MonoBehaviour {
 		numTimesPrinted++;
 		AnalyticsAgent.LogAnalyticEvent( AnalyticsAgent.AnalyticEvent.PrintFinished );
 		
-		mode = Random.Range( 0, 2 );
-		ColorAgent.AdvanceColorPack();
-		
+		//mode = Random.Range( 0, 2 );
+
 		ChangeState( State.Finished );
 	}
 

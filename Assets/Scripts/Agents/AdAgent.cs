@@ -96,6 +96,11 @@ public class AdAgent : MonoBehaviour {
 	{
 		if( Advertisement.isReady( interstitialVideoZoneId ) )
 		{
+			bool wasAudioOn = AudioAgent.GetIsAudioOn();
+
+			if( wasAudioOn )
+				AudioAgent.SetIsAudioOn( false );
+
 			Advertisement.Show( interstitialVideoZoneId, new ShowOptions {
 				pause = true,
 				resultCallback = result => {
@@ -105,6 +110,9 @@ public class AdAgent : MonoBehaviour {
 						case ShowResult.Failed: GameAgent.ChangeState( GameAgent.GetAfterAdState() ); break;
 						case ShowResult.Skipped: GameAgent.ChangeState( GameAgent.GetAfterAdState() ); break;
 					}
+
+					if( wasAudioOn )
+						AudioAgent.SetIsAudioOn( true );
 				}
 			} );
 		}
@@ -124,6 +132,11 @@ public class AdAgent : MonoBehaviour {
 	{
 		if( Advertisement.isReady( incentivizedVideoZoneId ) )
 		{
+			bool wasAudioOn = AudioAgent.GetIsAudioOn();
+			
+			if( wasAudioOn )
+				AudioAgent.SetIsAudioOn( false );
+
 			Advertisement.Show( incentivizedVideoZoneId, new ShowOptions {
 				pause = true,
 				resultCallback = result => {
@@ -133,6 +146,9 @@ public class AdAgent : MonoBehaviour {
 						case ShowResult.Failed: SpriteAgent.DidNotWatchAd(); break;
 						case ShowResult.Skipped: SpriteAgent.DidNotWatchAd(); break;
 					}
+
+					if( wasAudioOn )
+						AudioAgent.SetIsAudioOn( true );
 				}
 			} );
 		}

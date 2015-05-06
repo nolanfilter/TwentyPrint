@@ -42,6 +42,9 @@ public class ColorController : MonoBehaviour {
 
 	public void SetColor( Color color )
 	{
+		if( colorType == ColorAgent.ColorType.Foreground && ( color == ColorAgent.RainbowColor || color == ColorAgent.RandomColor ) )
+			color = ( ColorAgent.GetCurrentColorPack().backgroundColor == Color.white ? Color.black : Color.white );
+
 		switch( uiType )
 		{
 			case UIType.UIImage: GetComponent<Image>().color = new Color( color.r, color.g, color.b, GetComponent<Image>().color.a ); break;

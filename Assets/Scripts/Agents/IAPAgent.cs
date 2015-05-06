@@ -10,6 +10,8 @@ public class IAPAgent : MonoBehaviour {
 
 	public Text[] buttonTexts;
 
+	public TouchDownCallback[] callbacks;
+
 	private bool paidToRemoveAds;
 	private string paidToRemoveAdsString = "paidToRemoveAds";
 
@@ -55,10 +57,21 @@ public class IAPAgent : MonoBehaviour {
 		IOSInAppPurchaseManager.instance.addProductId( removeAdsProductString );
 	}
 
-	public static void PurchaseRemoveAds()
+	void OnEnable()
 	{
-		if( IOSInAppPurchaseManager.instance.IsStoreLoaded )
-			IOSInAppPurchaseManager.instance.buyProduct( removeAdsProductString );
+		for( int i = 0; i < callbacks.Length; i++ )
+			callbacks[i].OnAreaTouch += OnRemoveAdsAreaTouch;
+	}
+
+	void OnDisable()
+	{
+		for( int i = 0; i < callbacks.Length; i++ )
+			callbacks[i].OnAreaTouch -= OnRemoveAdsAreaTouch;
+	}
+
+	private void OnRemoveAdsAreaTouch()
+	{
+		PurchaseRemoveAds();
 	}
 
 	public static void RestorePurchases()
@@ -110,6 +123,9 @@ public class IAPAgent : MonoBehaviour {
 		{
 			case InAppPurchaseState.Purchased: case InAppPurchaseState.Restored:
 			{
+				Debug.Log( "Purchased " + response.productIdentifier );
+
+
 				if( response.productIdentifier == removeAdsProductString )
 				{
 					if( instance )
@@ -161,6 +177,16 @@ public class IAPAgent : MonoBehaviour {
 		{
 			for( int i = 0; i < buttonTexts.Length; i++ )
 				buttonTexts[i].text = purchaseText + " - " + priceString;
+		}
+	}
+
+	private void PurchaseRemoveAds()
+	{
+		if( IOSInAppPurchaseManager.instance.IsStoreLoaded )
+		{
+			Debug.Log( "Purchasing" );
+
+			IOSInAppPurchaseManager.instance.buyProduct( removeAdsProductString );
 		}
 	}
 

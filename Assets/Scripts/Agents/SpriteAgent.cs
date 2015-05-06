@@ -156,6 +156,24 @@ public class SpriteAgent : MonoBehaviour {
 		randomSpriteIndex = unlockedSpriteIndices[ Random.Range( 0, unlockedSpriteIndices.Count ) ];
 	}
 
+	public static void UnlockSpriteByName( string name )
+	{
+		if( instance )
+			instance.internalUnlockSpriteByName( name );
+	}
+
+	private void internalUnlockSpriteByName( string name )
+	{
+		for( int i = 0; i < sprites.Length; i++ )
+		{
+			if( sprites[i].name == name )
+			{
+				UnlockSprite( i );
+				return;
+			}
+		}
+	}
+
 	public static void UnlockAllSprites()
 	{
 		if( instance )
@@ -166,6 +184,8 @@ public class SpriteAgent : MonoBehaviour {
 	{
 		for( int i = 0; i < sprites.Length; i++ )
 			UnlockSprite( i );
+
+		PreferencesAgent.UpdateICloud();
 	}
 
 	public static void WatchedAd()
@@ -178,6 +198,14 @@ public class SpriteAgent : MonoBehaviour {
 	{
 		if( instance )
 			instance.StopCoroutine( "WaitForAdSuccess" );
+	}
+
+	public static Dictionary<string, bool> GetSpritesUnlockedDictionary()
+	{
+		if( instance )
+			return instance.spritesUnlocked;
+
+		return null;
 	}
 
 	private void SetSpriteIndex( int newSpriteIndex )
@@ -202,6 +230,8 @@ public class SpriteAgent : MonoBehaviour {
 		UnlockSprite( spriteIndexToUnlock );
 
 		SetSpriteIndex( spriteIndexToUnlock );
+
+		PreferencesAgent.UpdateICloud();
 	}
 
 	private void UnlockSprite( int spriteIndexToUnlock )

@@ -62,7 +62,8 @@ public class AnalyticsAgent : MonoBehaviour {
 	{
 		IOSProductTemplate product = IAPAgent.GetProductById( response.productIdentifier );
 
-		UnityAnalytics.Transaction( response.productIdentifier, decimal.Parse( product.localizedPrice ), product.currencyCode, response.receipt, null );
+		if( product != null )
+			UnityAnalytics.Transaction( response.productIdentifier, decimal.Parse( product.localizedPrice ), product.currencyCode, response.receipt, null );
 	}
 
 	public static int GetNumPrints()

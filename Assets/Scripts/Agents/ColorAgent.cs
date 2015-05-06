@@ -55,7 +55,7 @@ public class ColorAgent : MonoBehaviour {
 	}
 
 	private ColorPack[] colorPacks;
-	private int colorPackIndex = 0;
+	private int colorPackIndex = -1;
 	private string colorPackIndexString = "ColorPackIndex";
 
 	private Color[] currentColors;
@@ -101,10 +101,12 @@ public class ColorAgent : MonoBehaviour {
 		for( int i = 0; i < colorControllers.Length; i++ )
 			colorControllers[i] = new List<ColorController>();
 
-		/* if( PlayerPrefs.HasKey( colorPackIndexString ) )
+		/*
+		if( PlayerPrefs.HasKey( colorPackIndexString ) )
 			colorPackIndex = PlayerPrefs.GetInt( colorPackIndexString );
-		else */
+		else
 			colorPackIndex = 0;
+		 */
 	}
 
 	public static ColorPack GetCurrentColorPack()
@@ -142,6 +144,9 @@ public class ColorAgent : MonoBehaviour {
 	private void internalAdvanceColorPack()
 	{
 		SetColorPack( (ColorPackType)( ( colorPackIndex + 1 )%colorPacks.Length ) );
+		UpdateColor( ColorAgent.ColorType.Foreground );
+		UpdateColor( ColorAgent.ColorType.Background );
+		UpdateColor( ColorAgent.ColorType.Mid );
 	}
 
 	public static void RegisterColorController( ColorController colorController )
@@ -181,35 +186,6 @@ public class ColorAgent : MonoBehaviour {
 
 		if( currentColors[ colorIndex ] == color )
 			return;
-
-		if( colorType == ColorType.Foreground && ( color == RainbowColor || color == RandomColor ) )
-			color = ( GetCurrentColorPack().backgroundColor == Color.white ? Color.black : Color.white );
-
-		/*
-		switch( colorType )
-		{
-			case ColorType.Foreground:
-			{
-				if( color == RainbowColor || color == RandomColor )
-					color = ( GetCurrentColorPack().backgroundColor == Color.white ? Color.black : Color.white );
-					         
-				for( int i = 0; i < colorControllers[ colorIndex ].Count; i++ )
-					colorControllers[ colorIndex ][i].SetColor( color );
-			} break;
-
-			case ColorType.Background:
-			{
-				StopCoroutine( "DoBackgroundFade" );
-				StartCoroutine( "DoBackgroundFade", color );
-			} break;
-
-			case ColorType.Mid:
-			{
-				for( int i = 0; i < colorControllers[ colorIndex ].Count; i++ )
-					colorControllers[ colorIndex ][i].SetColor( color );
-			} break;
-		}
-		*/
 
 		for( int i = 0; i < colorControllers[ colorIndex ].Count; i++ )
 			colorControllers[ colorIndex ][i].SetColor( color );
