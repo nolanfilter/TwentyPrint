@@ -156,12 +156,12 @@ public class GameAgent : MonoBehaviour {
 			if( currentState == State.Printing )
 			{
 				ChangeState( State.Paused );
-				TipAgent.SetFirstTip();
+				TipAgent.ShowFirstTip();
 			}
 
 			if( currentState == State.Paused || currentState == State.Finished )
 			{
-				TipAgent.SetFirstTip();
+				TipAgent.ShowFirstTip();
 			}
 		}
 
@@ -180,9 +180,9 @@ public class GameAgent : MonoBehaviour {
 
 	private void OnShareAreaTouch()
 	{
-		StartCoroutine( "DoShare" );
-
 		wasSharing = true;
+
+		StartCoroutine( "DoShare" );
 	}
 
 	private void OnRestorePurchasesAreaTouch()
@@ -210,7 +210,7 @@ public class GameAgent : MonoBehaviour {
 
 	private void OnTouchUp( int fingerIndex, Vector2 fingerPos, float timeHeldDown )
 	{
-		if( !wasSharing && !wasDragging && CameraAgent.MainCameraObject.transform.localPosition.x == 0f )
+		if( !wasSharing && !wasDragging && !RatingAgent.GetPopUpEnabled() && CameraAgent.MainCameraObject.transform.localPosition.x == 0f )
 		{
 			switch( currentState )
 			{
@@ -294,6 +294,9 @@ public class GameAgent : MonoBehaviour {
 	
 	private void OnDragMove( int fingerIndex, Vector2 fingerPos, Vector2 delta )
 	{
+		if( RatingAgent.GetPopUpEnabled() )
+			return;
+
 		if( !wasDragging )
 		{
 			if( Mathf.Abs( fingerPos.x - dragBeginX ) > dragThreshold )
@@ -331,6 +334,9 @@ public class GameAgent : MonoBehaviour {
 	
 	private void OnDragUp( int fingerIndex, Vector2 fingerPos )
 	{
+		if( RatingAgent.GetPopUpEnabled() )
+			return;
+
 		if( Mathf.Abs( dragDeltaX ) > swipeThreshold )
 		{
 			currentScreenX -= Screen.width * Mathf.Sign( dragDeltaX );
@@ -364,10 +370,10 @@ public class GameAgent : MonoBehaviour {
 		return State.Invalid;
 	}
 
-	public static bool GetWasDragging()
+	public static bool GetWasHolding()
 	{
 		if( instance )
-			return instance.wasDragging;
+			return instance.wasDragging || instance.wasFastForwarding;
 
 		return false;
 	}
@@ -390,6 +396,7 @@ public class GameAgent : MonoBehaviour {
 			case State.Ready:
 			{
 				SetShareEnabled( false );
+				TipAgent.ShowFirstTip();
 
 				ColorAgent.AdvanceColorPack();
 
@@ -501,7 +508,8 @@ public class GameAgent : MonoBehaviour {
 	{
 		numTimesPrinted++;
 		AnalyticsAgent.LogAnalyticEvent( AnalyticsAgent.AnalyticEvent.PrintFinished );
-		
+		RatingAgent.CheckForPrompt();
+
 		//mode = Random.Range( 0, 2 );
 
 		ChangeState( State.Finished );
@@ -516,7 +524,7 @@ public class GameAgent : MonoBehaviour {
 			shareImage.enabled = enabled;
 		
 		if( shareCallback )
-			shareCallback.enabled = enabled;
+			shareCallback.gameObject.SetActive( enabled );
 
 		if( navigationImage )
 			navigationImage.enabled = enabled;

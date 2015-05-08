@@ -119,6 +119,9 @@ public class ColorAgent : MonoBehaviour {
 	
 	private ColorPack internalGetCurrentColorPack()
 	{
+		if( colorPackIndex < 0 || colorPackIndex >= colorPacks.Length )
+			return colorPacks[0];
+
 		return colorPacks[ colorPackIndex ];
 	}
 

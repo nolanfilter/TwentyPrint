@@ -12,6 +12,8 @@ public class TouchDownCallback : MonoBehaviour {
 
 	public ColorController colorController;
 
+	public bool ignoreOnPopUp = false;
+
 	private RectTransform rectTransform;
 	
 	void Awake()
@@ -26,7 +28,7 @@ public class TouchDownCallback : MonoBehaviour {
 
 		FingerGestures.OnFingerUp += OnTouchUp;
 	}
-	
+
 	void OnDestroy()
 	{
 		if( colorController )
@@ -40,13 +42,19 @@ public class TouchDownCallback : MonoBehaviour {
 
 	private void OnTouchDown( int fingerIndex, Vector2 fingerPos )
 	{
-		if( RectTransformUtility.RectangleContainsScreenPoint( rectTransform, fingerPos, null ) && !GameAgent.GetWasDragging() )
+		if( !gameObject.activeInHierarchy || ( ignoreOnPopUp && RatingAgent.GetPopUpEnabled() ) )
+			return;
+
+		if( RectTransformUtility.RectangleContainsScreenPoint( rectTransform, fingerPos, null ) && !GameAgent.GetWasHolding() )
 			colorController.SetColor( ColorAgent.GetCurrentColorPack().midColor );
 	}
 
 	private void OnTouchMove( int fingerIndex, Vector2 fingerPos )
 	{
-		if( RectTransformUtility.RectangleContainsScreenPoint( rectTransform, fingerPos, null ) && !GameAgent.GetWasDragging() )
+		if( !gameObject.activeInHierarchy || ( ignoreOnPopUp && RatingAgent.GetPopUpEnabled() ) )
+			return;
+
+		if( RectTransformUtility.RectangleContainsScreenPoint( rectTransform, fingerPos, null ) && !GameAgent.GetWasHolding() )
 			colorController.SetColor( ColorAgent.GetCurrentColorPack().midColor );
 		else
 			colorController.SetColor( ColorAgent.GetCurrentColorPack().TypeToColor( colorController.colorType ) );
@@ -54,10 +62,13 @@ public class TouchDownCallback : MonoBehaviour {
 
 	private void OnTouchUp( int fingerIndex, Vector2 fingerPos, float timeHeldDown )
 	{
+		if( !gameObject.activeInHierarchy || ( ignoreOnPopUp && RatingAgent.GetPopUpEnabled() ) )
+			return;
+
 		if( colorController )
 			colorController.SetColor( ColorAgent.GetCurrentColorPack().TypeToColor( colorController.colorType ) );
 
-		if( GameAgent.GetWasDragging() )
+		if( GameAgent.GetWasHolding() )
 			return;
 
 		if( RectTransformUtility.RectangleContainsScreenPoint( rectTransform, fingerPos, null ) )

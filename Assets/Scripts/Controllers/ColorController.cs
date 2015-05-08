@@ -33,6 +33,7 @@ public class ColorController : MonoBehaviour {
 	void OnEnable()
 	{
 		ColorAgent.RegisterColorController( this );
+		SetColor( ColorAgent.GetCurrentColorPack().TypeToColor( colorType ) );
 	}
 	
 	void OnDisable()

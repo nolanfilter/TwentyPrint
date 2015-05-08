@@ -36,19 +36,14 @@ public class TipAgent : MonoBehaviour {
 
 		deck = new List<int>();
 	}
-
-	void Start()
-	{
-		SetFirstTip();
-	}
-
-	public static void SetFirstTip()
+	
+	public static void ShowFirstTip()
 	{
 		if( instance )
 			SetTip( instance.firstTipIndex );
 	}
 
-	public static void SetSecondTip()
+	public static void ShowSecondTip()
 	{
 		if( instance )
 			SetTip( instance.secondTipIndex );
