@@ -10,6 +10,7 @@ public class AudioAgent : MonoBehaviour {
 		Print = 0,
 		ButtonTap = 1,
 		Swipe = 2,
+		PrintFinish = 3,
 	}
 
 	public TouchDownCallback soundsCallback;
@@ -18,6 +19,7 @@ public class AudioAgent : MonoBehaviour {
 	public AudioClip[] printAudioClips;
 	public AudioClip buttonTapAudioClip;
 	public AudioClip swipeAudioClip;
+	public AudioClip printFinishClip;
 
 	private Dictionary<SoundEffectType, AudioSource> audioSourcesByType;
 
@@ -115,6 +117,7 @@ public class AudioAgent : MonoBehaviour {
 				case SoundEffectType.Print: clip = printAudioClips[ NextRandomIndex() ]; break;
 				case SoundEffectType.ButtonTap: clip = buttonTapAudioClip; break;
 				case SoundEffectType.Swipe: clip = swipeAudioClip; break;
+				case SoundEffectType.PrintFinish: clip = printFinishClip; break;
 			}
 
 			if( clip == null )
@@ -212,6 +215,7 @@ public class AudioAgent : MonoBehaviour {
 
 		audioSourcesByType.Remove( soundEffectType );
 
+		/*
 		if( audioSource.loop )
 		{
 			currentTime = 0f;
@@ -231,6 +235,7 @@ public class AudioAgent : MonoBehaviour {
 
 			} while( currentTime < fadeOutDuration );
 		}
+		*/
 
 		Destroy( audioSource );
 	}

@@ -15,7 +15,7 @@ public class AdAgent : MonoBehaviour {
 
 	private bool hasIAd = false;
 
-	private int numFreePrints = 10;
+	private int numFreePrints = 12;
 	private int adSchedule = 3;
 
 	private static AdAgent mInstance;
@@ -74,6 +74,9 @@ public class AdAgent : MonoBehaviour {
 
 	private void internalShowInterstitialImage()
 	{
+		if( IAPAgent.GetPaidToRemoveAds() )
+			return;
+
 		if( IsTimeForAnAd() && hasIAd )
 		{
 			iAdBannerController.instance.ShowInterstitialAd();
@@ -82,7 +85,10 @@ public class AdAgent : MonoBehaviour {
 		}
 		else
 		{
-			GameAgent.ChangeState( GameAgent.State.Ready );
+			if( RatingAgent.GetPopUpEnabled() )
+				StartCoroutine( "DoWaitForPopUpResult" );
+			else
+				GameAgent.ChangeState( GameAgent.State.Ready );
 		}
 	}
 
@@ -94,6 +100,9 @@ public class AdAgent : MonoBehaviour {
 
 	private void internalShowInterstitialVideo()
 	{
+		if( IAPAgent.GetPaidToRemoveAds() )
+			return;
+
 		if( Advertisement.isReady( interstitialVideoZoneId ) )
 		{
 			bool wasAudioOn = AudioAgent.GetIsAudioOn();
@@ -113,7 +122,7 @@ public class AdAgent : MonoBehaviour {
 
 					if( wasAudioOn )
 						AudioAgent.SetIsAudioOn( true );
-				}
+				}	
 			} );
 		}
 		else
@@ -130,6 +139,9 @@ public class AdAgent : MonoBehaviour {
 	
 	private void internalShowIncentivizedVideo()
 	{
+		if( IAPAgent.GetPaidToRemoveAds() )
+			return;
+
 		if( Advertisement.isReady( incentivizedVideoZoneId ) )
 		{
 			bool wasAudioOn = AudioAgent.GetIsAudioOn();
@@ -163,7 +175,15 @@ public class AdAgent : MonoBehaviour {
 	{
 		hasIAd = true;
 	}
-	
+
+	private IEnumerator DoWaitForPopUpResult()
+	{
+		while( RatingAgent.GetPopUpEnabled() )
+			yield return null;
+
+		GameAgent.ChangeState( GameAgent.State.Ready );
+	}
+
 	private IEnumerator DoPostInterstitialImage()
 	{
 		hasIAd = false;

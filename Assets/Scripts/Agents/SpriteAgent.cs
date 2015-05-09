@@ -81,7 +81,7 @@ public class SpriteAgent : MonoBehaviour {
 		CheckAllSpritesUnlocked();
 
 		if( !PlayerPrefs.HasKey( spriteIndexString ) )
-			PlayerPrefs.SetInt( spriteIndexString, 0 );
+			PlayerPrefs.SetInt( spriteIndexString, 23 );
 
 		SetSpriteIndex( PlayerPrefs.GetInt( spriteIndexString ) );
 	}

@@ -25,6 +25,10 @@ public class GameAgent : MonoBehaviour {
 	public Text shareText;
 	public Image shareImage;
 
+	public TouchDownCallback restartCallback;
+	public Text restartText;
+	public Image restartImage;
+
 	private string shareCopy = "Look what I made! Make something cool with #20print! https://itunes.apple.com/us/app/20print/id900236159?mt=8";
 
 	public Image navigationImage;
@@ -57,6 +61,7 @@ public class GameAgent : MonoBehaviour {
 	private float navigationDuration = 0.2f;
 	private float currentScreenX = 0f;
 	private float targetScreenX = 0f;
+	private float extraScreenPercent = 0.25f;
 
 	private float widthRatio = 1f;
 	private float dragBeginX;
@@ -64,9 +69,14 @@ public class GameAgent : MonoBehaviour {
 	private float dragThreshold = 15f;
 	private float swipeThreshold = 20f;
 
+	private bool showUI = true;
 	private bool wasFastForwarding = false;
 	private bool wasSharing = false;
+	private bool wasRestarting = false;
 	private bool wasDragging = false;
+
+	private float lastTouchUpTime;
+	private float doubleTapMaxDuration = 0.1f;
 
 	private static GameAgent mInstance = null;
 	public static GameAgent instance
@@ -110,6 +120,9 @@ public class GameAgent : MonoBehaviour {
 		if( shareCallback )
 			shareCallback.OnAreaTouch += OnShareAreaTouch;
 
+		if( restartCallback )
+			restartCallback.OnAreaTouch +=OnRestartAreaTouch;
+
 		if( restorePurchasesCallback )
 			restorePurchasesCallback.OnAreaTouch += OnRestorePurchasesAreaTouch;
 
@@ -131,6 +144,9 @@ public class GameAgent : MonoBehaviour {
 	{
 		if( shareCallback )
 			shareCallback.OnAreaTouch -= OnShareAreaTouch;
+
+		if( restartCallback )
+			restartCallback.OnAreaTouch -= OnRestartAreaTouch;
 		
 		if( restorePurchasesCallback )
 			restorePurchasesCallback.OnAreaTouch -= OnRestorePurchasesAreaTouch;
@@ -178,6 +194,13 @@ public class GameAgent : MonoBehaviour {
 	}
 	*/
 
+	private void OnRestartAreaTouch()
+	{
+		wasRestarting = true;
+
+		ChangeState( State.Advertising );
+	}
+
 	private void OnShareAreaTouch()
 	{
 		wasSharing = true;
@@ -210,7 +233,12 @@ public class GameAgent : MonoBehaviour {
 
 	private void OnTouchUp( int fingerIndex, Vector2 fingerPos, float timeHeldDown )
 	{
-		if( !wasSharing && !wasDragging && !RatingAgent.GetPopUpEnabled() && CameraAgent.MainCameraObject.transform.localPosition.x == 0f )
+		bool didDoubleTap = ( Time.time - lastTouchUpTime < doubleTapMaxDuration );
+
+		if( didDoubleTap )
+			OnDoubleTap( fingerIndex, fingerPos );
+
+		if( !didDoubleTap && !wasSharing && !wasRestarting && !wasDragging && !RatingAgent.GetPopUpEnabled() && CameraAgent.MainCameraObject.transform.localPosition.x == 0f )
 		{
 			switch( currentState )
 			{
@@ -221,7 +249,8 @@ public class GameAgent : MonoBehaviour {
 
 				case State.Printing:
 				{
-					ChangeState( State.Paused );
+					if( !wasFastForwarding )
+						ChangeState( State.Paused );
 				} break;
 
 				case State.Paused:
@@ -237,7 +266,10 @@ public class GameAgent : MonoBehaviour {
 				case State.Finished:
 				{
 					if( !wasFastForwarding )
-						ChangeState( State.Advertising );
+					{
+						showUI = !showUI;
+						SetUIEnabled( true );
+					}
 				} break;
 
 				case State.Advertising:
@@ -250,18 +282,21 @@ public class GameAgent : MonoBehaviour {
 
 		wasFastForwarding = false;
 		wasSharing = false;
+		wasRestarting = false;
+
+		lastTouchUpTime = Time.time;
 	}
 
 	private void OnLongPress( int fingerIndex, Vector2 fingerPos )
 	{
 		if( CameraAgent.MainCameraObject.transform.localPosition.x == 0f )
 		{
-			if( currentState == State.Ready )
+			if( currentState == State.Ready || currentState == State.Paused )
 			{
 				ChangeState( State.Printing );
 			}
 
-			if( currentState == State.Printing || currentState == State.Paused )
+			if( currentState == State.Printing )
 			{
 				ChangeState( State.FastForwarding );
 			}
@@ -303,8 +338,9 @@ public class GameAgent : MonoBehaviour {
 			{
 				if( currentState == State.Printing || currentState == State.FastForwarding )
 					ChangeState( State.Paused );
-				else
-					SetShareEnabled( true );
+
+				showUI = true;
+				SetUIEnabled( currentState != State.Ready );
 
 				StopCoroutine( "DoNavigation" );
 
@@ -322,10 +358,10 @@ public class GameAgent : MonoBehaviour {
 
 		float absPosition = Mathf.Abs( newPosition );
 
-		if( absPosition < Screen.width * 1.5f )
+		if( absPosition < Screen.width * ( 1f + extraScreenPercent ) )
 			targetScreenX = newPosition;
 		else
-			targetScreenX = Screen.width * 1.5f * Mathf.Sign( newPosition );
+			targetScreenX = Screen.width * ( 1f + extraScreenPercent ) * Mathf.Sign( newPosition );
 
 		UpdateNavigationHighlight( true );
 
@@ -395,8 +431,10 @@ public class GameAgent : MonoBehaviour {
 		{
 			case State.Ready:
 			{
-				SetShareEnabled( false );
+				showUI = true;
+				SetUIEnabled( false );
 				TipAgent.ShowFirstTip();
+				UpdateNavigationHighlight( true );
 
 				ColorAgent.AdvanceColorPack();
 
@@ -410,7 +448,7 @@ public class GameAgent : MonoBehaviour {
 				
 			case State.Printing:
 			{
-				SetShareEnabled( false );
+				SetUIEnabled( false );
 			
 				speed = (float)BoardAgent.BoardSize / fillTime;
 
@@ -424,7 +462,7 @@ public class GameAgent : MonoBehaviour {
 			case State.Paused:
 			{				
 				TipAgent.ShowNextTip();
-				SetShareEnabled( true );
+				SetUIEnabled( true );
 				
 				speed = 0f;
 
@@ -433,7 +471,7 @@ public class GameAgent : MonoBehaviour {
 				
 			case State.FastForwarding:
 			{				
-				SetShareEnabled( false );
+				SetUIEnabled( false );
 				
 				speed = (float)BoardAgent.BoardSize / fillTime * 5f;
 
@@ -444,12 +482,15 @@ public class GameAgent : MonoBehaviour {
 				
 			case State.Finished:
 			{
+				showUI = true;
 				TipAgent.ShowNextTip();
-				SetShareEnabled( true );
+				SetUIEnabled( true );
 			} break;
 				
 			case State.Advertising:
 			{
+				SetUIEnabled( false );
+				RatingAgent.CheckForPrompt();
 				AdAgent.ShowInterstitialImage();
 			} break;
 		}
@@ -508,23 +549,33 @@ public class GameAgent : MonoBehaviour {
 	{
 		numTimesPrinted++;
 		AnalyticsAgent.LogAnalyticEvent( AnalyticsAgent.AnalyticEvent.PrintFinished );
-		RatingAgent.CheckForPrompt();
+		AudioAgent.StopSoundEffect( AudioAgent.SoundEffectType.Print );
+		AudioAgent.PlaySoundEffect( AudioAgent.SoundEffectType.PrintFinish );
 
 		//mode = Random.Range( 0, 2 );
 
 		ChangeState( State.Finished );
 	}
 
-	private void SetShareEnabled( bool enabled )
+	private void SetUIEnabled( bool enabled )
 	{
 		if( shareText )
-			shareText.enabled = enabled;
+			shareText.enabled = enabled && showUI;
 		
 		if( shareImage )
-			shareImage.enabled = enabled;
+			shareImage.enabled = enabled && showUI;
 		
 		if( shareCallback )
-			shareCallback.gameObject.SetActive( enabled );
+			shareCallback.gameObject.SetActive( enabled && showUI );
+
+		if( restartText )
+			restartText.enabled = enabled && showUI;
+
+		if( restartImage )
+			restartImage.enabled = enabled && showUI;
+
+		if( restartCallback )
+			restartCallback.gameObject.SetActive( enabled && showUI );
 
 		if( navigationImage )
 			navigationImage.enabled = enabled;
@@ -552,19 +603,32 @@ public class GameAgent : MonoBehaviour {
 
 	private void UpdateNavigationHighlight( bool canShow )
 	{
-		TipAgent.SetTipEnabled( canShow && CameraAgent.MainCameraObject.transform.localPosition.x == 0f && !wasDragging );
+		bool shouldShowTip = canShow && CameraAgent.MainCameraObject.transform.localPosition.x == 0f && !wasDragging && showUI;
+
+		TipAgent.SetTipEnabled( shouldShowTip );
 
 		if( navigationImage )
-			navigationImage.enabled = ( canShow && CameraAgent.MainCameraObject.transform.localPosition.x == 0f && !wasDragging );
+			navigationImage.enabled = shouldShowTip;
+
+		bool shouldShowDots = canShow && ( CameraAgent.MainCameraObject.transform.localPosition.x != 0f || showUI );
+
+		if( settingsIndent )
+			settingsIndent.enabled = shouldShowDots;
+		
+		if( mainIndent )
+			mainIndent.enabled = shouldShowDots;
+
+		if( storeIndent )
+			storeIndent.enabled = shouldShowDots;
 
 		if( settingsHighlight )
-			settingsHighlight.enabled = ( canShow && currentScreenX == Screen.width * -1f );
+			settingsHighlight.enabled = ( shouldShowDots && currentScreenX == Screen.width * -1f );
 		
 		if( mainHighlight )
-			mainHighlight.enabled = ( canShow && currentScreenX == 0f );
+			mainHighlight.enabled = ( shouldShowDots && currentScreenX == 0f );
 		
 		if( storeHighlight )
-			storeHighlight.enabled = ( canShow && currentScreenX == Screen.width );
+			storeHighlight.enabled = ( shouldShowDots && currentScreenX == Screen.width );
 	}
 
 	private IEnumerator DoDragNavigation()
@@ -607,8 +671,9 @@ public class GameAgent : MonoBehaviour {
 
 		if( currentState == State.Ready && currentScreenX == 0f )
 		{
-			SetShareEnabled( false );
+			SetUIEnabled( false );
 			TipAgent.SetTipEnabled( true );
+			UpdateNavigationHighlight( true );
 		}
 	}
 
