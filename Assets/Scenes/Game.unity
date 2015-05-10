@@ -198,6 +198,10 @@ Prefab:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 11405046, guid: 005a3bc5084ed416dbccdde1d842328f, type: 2}
+      propertyPath: freeSprites.Array.size
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 455338, guid: 005a3bc5084ed416dbccdde1d842328f, type: 2}
       propertyPath: m_LocalPosition.x
       value: 0

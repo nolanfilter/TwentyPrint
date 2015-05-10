@@ -52,7 +52,7 @@ public class AdAgent : MonoBehaviour {
 		
 		if( Advertisement.isSupported )
 		{
-			Advertisement.Initialize( gameID, true );
+			Advertisement.Initialize( gameID, false );
 			Advertisement.allowPrecache = true;
 		}
 

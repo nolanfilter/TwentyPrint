@@ -1,12 +1,18 @@
 ﻿using UnityEngine;
 using UnityEngine.Cloud.Analytics;
 using System.Collections;
+using System.Collections.Generic;
 
 public class AnalyticsAgent : MonoBehaviour {
 
 	public enum AnalyticEvent
 	{
 		PrintFinished = 0,
+		UnlockSprite = 1,
+		Share = 2,
+		StoreScreen = 3,
+		SettingsScreen = 4,
+		More = 5,
 	}
 
 	private int numPrints = 0;
@@ -37,7 +43,7 @@ public class AnalyticsAgent : MonoBehaviour {
 		if( PlayerPrefs.HasKey( lifetimePrintsString ) )
 			numPrints = PlayerPrefs.GetInt( lifetimePrintsString );
 
-		UnityAnalytics.StartSDK (projectId);
+		UnityAnalytics.StartSDK( projectId );
 	}
 
 	public static void LogAnalyticEvent( AnalyticEvent analyticEvent )
@@ -48,8 +54,56 @@ public class AnalyticsAgent : MonoBehaviour {
 
 	private void internalLogAnalyticEvent( AnalyticEvent analyticEvent )
 	{
-		if( analyticEvent == AnalyticEvent.PrintFinished )
-			numPrints++;
+		switch( analyticEvent )
+		{
+			case AnalyticEvent.PrintFinished:
+			{
+				numPrints++;
+				PlayerPrefs.SetInt( lifetimePrintsString, numPrints );
+
+				List<string> spritesUsed = SpriteAgent.GetSpritesUsed();
+
+				Dictionary<string, object> spritesUsedDictionary = new Dictionary<string, object>();
+
+				int index = 0;
+
+				while( index < spritesUsed.Count && index < 10 )
+				{
+					spritesUsedDictionary.Add( "sprite" + index, spritesUsed[ spritesUsed.Count - 1 - index ] );
+					index++;
+				}
+
+				UnityAnalytics.CustomEvent( "printFinished", spritesUsedDictionary );
+			} break;
+
+			case AnalyticEvent.UnlockSprite:
+			{
+				UnityAnalytics.CustomEvent( "unlockSprite", new Dictionary<string, object>
+				{
+					{ "unlockedSprite", SpriteAgent.GetCurrentSprite().name },
+				});
+			} break;
+
+			case AnalyticEvent.Share:
+			{
+				UnityAnalytics.CustomEvent( "share", new Dictionary<string, object>{} );
+			} break;
+
+			case AnalyticEvent.StoreScreen:
+			{
+				UnityAnalytics.CustomEvent( "storeScreen", new Dictionary<string, object>{} );
+			} break;
+
+			case AnalyticEvent.SettingsScreen:
+			{
+				UnityAnalytics.CustomEvent( "settingsScreen", new Dictionary<string, object>{} );
+			} break;
+
+			case AnalyticEvent.More:
+			{
+				UnityAnalytics.CustomEvent( "more", new Dictionary<string, object>{} );
+			} break;
+		}
 	}
 
 	public static void LogTranscation( IOSStoreKitResponse response )

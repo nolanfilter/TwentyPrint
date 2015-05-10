@@ -5908,7 +5908,7 @@ MonoBehaviour:
   soundsCallback: {fileID: 11485978}
   soundsText: {fileID: 11433662}
   printAudioClips:
-  - {fileID: 8300000, guid: a84f7e3009b2145899d021e29d07d1b0, type: 3}
+  - {fileID: 8300000, guid: 7314ad126dbc24374a6c1c66ae253e4e, type: 3}
   buttonTapAudioClip: {fileID: 8300000, guid: f180d63df679b41b19cd5b0d7571b724, type: 3}
   swipeAudioClip: {fileID: 0}
   printFinishClip: {fileID: 8300000, guid: f9c8a485c64f647e9a86327f2fad61a7, type: 3}
@@ -6752,7 +6752,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 54bb438ce70714aa0a09d53c03083193, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  version: 1.05999994
+  version: .0700000003
   deletePlayerPrefs: 0
 --- !u!114 &11480666
 MonoBehaviour:
@@ -11250,10 +11250,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 22402420}
   m_RootOrder: 4
-  m_AnchorMin: {x: .5, y: .5}
-  m_AnchorMax: {x: .5, y: .5}
+  m_AnchorMin: {x: .5, y: 0}
+  m_AnchorMax: {x: .5, y: 1}
   m_AnchoredPosition: {x: -3.05175781e-05, y: 0}
-  m_SizeDelta: {x: 750, y: 1334}
+  m_SizeDelta: {x: 750, y: 0}
   m_Pivot: {x: .5, y: .5}
 --- !u!224 &22497394
 RectTransform:

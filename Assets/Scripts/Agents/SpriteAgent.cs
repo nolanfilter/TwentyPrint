@@ -17,6 +17,8 @@ public class SpriteAgent : MonoBehaviour {
 	private Dictionary<string, bool> spritesUnlocked;
 	private List<int> unlockedSpriteIndices;
 
+	private List<string> spritesUsed;
+
 	private int randomSpriteIndex = -1;
 
 	private float outlineWidth = 2.5f;
@@ -46,6 +48,7 @@ public class SpriteAgent : MonoBehaviour {
 
 		spritesUnlocked = new Dictionary<string, bool>();
 		unlockedSpriteIndices = new List<int>();
+		spritesUsed = new List<string>();
 
 		for( int i = 0; i < sprites.Length; i++ )
 		{
@@ -215,6 +218,34 @@ public class SpriteAgent : MonoBehaviour {
 		return null;
 	}
 
+	public static void LogSpriteName()
+	{
+		if( instance )
+			instance.internalLogSpriteName();
+	}
+
+	private void internalLogSpriteName()
+	{
+		string name = sprites[ spriteIndex ].name;
+
+		if( !spritesUsed.Contains( name ) )
+			spritesUsed.Add( name );
+	}
+
+	public static List<string> GetSpritesUsed()
+	{
+		if( instance )
+			return instance.spritesUsed;
+
+		return null;
+	}
+
+	public static void ClearSpriteNames()
+	{
+		if( instance )
+			instance.spritesUsed.Clear();
+	}
+
 	private void SetSpriteIndex( int newSpriteIndex )
 	{
 		storeSpriteControllers[ spriteIndex ].outline.rectTransform.offsetMin = Vector2.one * outlineWidth * -1f;
@@ -238,6 +269,7 @@ public class SpriteAgent : MonoBehaviour {
 
 		SetSpriteIndex( spriteIndexToUnlock );
 
+		AnalyticsAgent.LogAnalyticEvent( AnalyticsAgent.AnalyticEvent.UnlockSprite );
 		PreferencesAgent.UpdateICloud();
 
 		CheckAllSpritesUnlocked();

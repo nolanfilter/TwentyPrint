@@ -51,8 +51,6 @@ public class GameAgent : MonoBehaviour {
 	private int[] deck;
 
 	private float colorOffset;
-	
-	private int numTimesPrinted = 0;
 
 	private int mode = 1;
 
@@ -198,12 +196,20 @@ public class GameAgent : MonoBehaviour {
 	{
 		wasRestarting = true;
 
+		if( currentState != State.Finished )
+		{
+			AudioAgent.StopSoundEffect( AudioAgent.SoundEffectType.Print );
+			AnalyticsAgent.LogAnalyticEvent( AnalyticsAgent.AnalyticEvent.PrintFinished );
+		}
+
 		ChangeState( State.Advertising );
 	}
 
 	private void OnShareAreaTouch()
 	{
 		wasSharing = true;
+
+		AnalyticsAgent.LogAnalyticEvent( AnalyticsAgent.AnalyticEvent.Share );
 
 		StartCoroutine( "DoShare" );
 	}
@@ -223,7 +229,7 @@ public class GameAgent : MonoBehaviour {
 
 	private void OnMoreAreaTouch()
 	{
-		Debug.Log( "more" );
+		AnalyticsAgent.LogAnalyticEvent( AnalyticsAgent.AnalyticEvent.More );
 
 		if( Application.isEditor )
 			Application.OpenURL( "http://itunes.com/TwentyPercent" );
@@ -438,6 +444,8 @@ public class GameAgent : MonoBehaviour {
 
 				ColorAgent.AdvanceColorPack();
 
+				SpriteAgent.ClearSpriteNames();
+
 				BoardAgent.ResetBoard();
 				ShuffleDeck();
 				colorOffset = Random.Range( 0f, 360f );
@@ -451,6 +459,8 @@ public class GameAgent : MonoBehaviour {
 				SetUIEnabled( false );
 			
 				speed = (float)BoardAgent.BoardSize / fillTime;
+
+				SpriteAgent.LogSpriteName();
 
 				AudioAgent.PlaySoundEffect( AudioAgent.SoundEffectType.Print, fillTime );
 				AudioAgent.PitchSoundEffect( AudioAgent.SoundEffectType.Print, 1f );
@@ -547,12 +557,9 @@ public class GameAgent : MonoBehaviour {
 
 	private void FinishPrint()
 	{
-		numTimesPrinted++;
 		AnalyticsAgent.LogAnalyticEvent( AnalyticsAgent.AnalyticEvent.PrintFinished );
 		AudioAgent.StopSoundEffect( AudioAgent.SoundEffectType.Print );
 		AudioAgent.PlaySoundEffect( AudioAgent.SoundEffectType.PrintFinish );
-
-		//mode = Random.Range( 0, 2 );
 
 		ChangeState( State.Finished );
 	}
@@ -675,6 +682,12 @@ public class GameAgent : MonoBehaviour {
 			TipAgent.SetTipEnabled( true );
 			UpdateNavigationHighlight( true );
 		}
+
+		if( currentScreenX < 0f )
+			AnalyticsAgent.LogAnalyticEvent( AnalyticsAgent.AnalyticEvent.SettingsScreen );
+
+		if( currentScreenX > 0f )
+			AnalyticsAgent.LogAnalyticEvent( AnalyticsAgent.AnalyticEvent.StoreScreen );
 	}
 
 	private IEnumerator DoPrint()
