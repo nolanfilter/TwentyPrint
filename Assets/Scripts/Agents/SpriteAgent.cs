@@ -226,7 +226,12 @@ public class SpriteAgent : MonoBehaviour {
 
 	private void internalLogSpriteName()
 	{
-		string name = sprites[ spriteIndex ].name;
+		string name = "";
+
+		if( spriteIndex >= 0 && spriteIndex < sprites.Length )
+			name = sprites[ spriteIndex ].name;
+		else if( spriteIndex == sprites.Length )
+			name = sprites[ randomSpriteIndex ].name;
 
 		if( !spritesUsed.Contains( name ) )
 			spritesUsed.Add( name );
