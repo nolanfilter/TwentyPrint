@@ -48,13 +48,13 @@ public class IAPAgent : MonoBehaviour {
 				buttonTexts[i].gameObject.SetActive( false );
 		}
 
+		IOSInAppPurchaseManager.instance.addProductId( removeAdsProductString );
+
 		IOSInAppPurchaseManager.instance.OnStoreKitInitComplete += OnStoreKitInitComplete;
 		IOSInAppPurchaseManager.instance.OnTransactionComplete += OnTransactionComplete;
 		IOSInAppPurchaseManager.instance.OnRestoreComplete += OnRestoreComplete;
 
 		IOSInAppPurchaseManager.instance.loadStore();
-
-		IOSInAppPurchaseManager.instance.addProductId( removeAdsProductString );
 	}
 
 	void OnEnable()
@@ -105,7 +105,7 @@ public class IAPAgent : MonoBehaviour {
 			if( product != null )
 			{
 				if( instance )
-					instance.SetPurchaseText( "" + product.currencySymbol + product.localizedPrice );
+					instance.SetPurchaseText( "" + product.localizedPrice );
 			}
 		}
 		else
@@ -123,8 +123,7 @@ public class IAPAgent : MonoBehaviour {
 		{
 			case InAppPurchaseState.Purchased: case InAppPurchaseState.Restored:
 			{
-				Debug.Log( "Purchased " + response.productIdentifier );
-
+				//Debug.Log( "Purchased " + response.productIdentifier );
 
 				if( response.productIdentifier == removeAdsProductString )
 				{
@@ -182,12 +181,7 @@ public class IAPAgent : MonoBehaviour {
 
 	private void PurchaseRemoveAds()
 	{
-		if( IOSInAppPurchaseManager.instance.IsStoreLoaded )
-		{
-			Debug.Log( "Purchasing" );
-
-			IOSInAppPurchaseManager.instance.buyProduct( removeAdsProductString );
-		}
+		IOSInAppPurchaseManager.instance.buyProduct( removeAdsProductString );
 	}
 
 	private void RemoveAds()
