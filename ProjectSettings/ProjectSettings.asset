@@ -3,17 +3,14 @@
 --- !u!129 &1
 PlayerSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 6
+  serializedVersion: 7
   AndroidProfiler: 0
   defaultScreenOrientation: 0
   targetDevice: 0
-  targetGlesGraphics: 1
-  targetIOSGraphics: -1
   targetResolution: 0
   accelerometerFrequency: 60
   companyName: Twenty Percent Games
   productName: 20print
-  cloudProjectId: 
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
   m_ShowUnitySplashScreen: 0
@@ -26,7 +23,6 @@ PlayerSettings:
   m_ActiveColorSpace: 0
   m_MTRendering: 1
   m_MobileMTRendering: 0
-  m_UseDX11: 1
   m_Stereoscopic3D: 0
   iosShowActivityIndicatorOnLoading: -1
   androidShowActivityIndicatorOnLoading: -1
@@ -132,6 +128,7 @@ PlayerSettings:
   iOSLaunchScreenCustomXibPath: 
   AndroidTargetDevice: 0
   AndroidSplashScreenScale: 0
+  androidSplashScreen: {fileID: 0}
   AndroidKeystoreName: 
   AndroidKeyaliasName: 
   AndroidTVCompatibility: 1
@@ -149,6 +146,10 @@ PlayerSettings:
     - m_Icon: {fileID: 2800000, guid: a98fe26cca50f45da8c21861e431b0d8, type: 3}
       m_Size: 128
   m_BuildTargetBatching: []
+  m_BuildTargetGraphicsAPIs:
+  - m_BuildTarget: AndroidPlayer
+    m_APIs: 08000000
+    m_Automatic: 0
   webPlayerTemplate: APPLICATION:Default
   m_TemplateCustomTags: {}
   actionOnDotNetUnhandledException: 1
@@ -210,6 +211,7 @@ PlayerSettings:
   ps4ApplicationParam2: 0
   ps4ApplicationParam3: 0
   ps4ApplicationParam4: 0
+  ps4GarlicHeapSize: 2048
   ps4Passcode: Lvr2qLBk1vVDLFnQXFCaWsjaLzAPNJnr
   ps4pnSessions: 1
   ps4pnPresence: 1
@@ -264,6 +266,7 @@ PlayerSettings:
   psp2InfoBarOnStartup: 0
   psp2InfoBarColor: 0
   psmSplashimage: {fileID: 0}
+  virtualRealitySupported: 0
   spritePackerPolicy: 
   scriptingDefineSymbols: {}
   metroPackageName: TwentyPrint
@@ -352,8 +355,7 @@ PlayerSettings:
   blackberrySquareSplashScreen: {fileID: 0}
   tizenProductDescription: 
   tizenProductURL: 
-  tizenCertificatePath: 
-  tizenCertificatePassword: 
+  tizenSigningProfileName: 
   tizenGPSPermissions: 0
   tizenMicrophonePermissions: 0
   stvDeviceAddress: 
@@ -394,11 +396,18 @@ PlayerSettings:
   iOS::Architecture: 2
   iOS::ScriptingBackend: 1
   boolPropertyNames:
+  - WebGL::analyzeBuildSize
   - WebGL::dataCaching
+  WebGL::analyzeBuildSize: 0
   WebGL::dataCaching: 0
   stringPropertyNames:
   - WebGL::emscriptenArgs
   - WebGL::template
   WebGL::emscriptenArgs: 
   WebGL::template: APPLICATION:Default
-  firstStreamedLevelWithResources: 0
+  firstStreamedSceneWithResources: 0
+  cloudProjectId: 666c8c0f-582f-4219-a39b-e55e36cd4702
+  projectId: 
+  projectName: 
+  organizationId: 
+  cloudEnabled: 0

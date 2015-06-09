@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using UnityEngine.Cloud.Analytics;
+using UnityEngine.Analytics;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -17,9 +17,7 @@ public class AnalyticsAgent : MonoBehaviour {
 
 	private int numPrints = 0;
 	private string lifetimePrintsString = "LifetimePrints";
-
-	private const string projectId = "666c8c0f-582f-4219-a39b-e55e36cd4702";
-
+	
 	private static AnalyticsAgent mInstance;
 	public static AnalyticsAgent instance
 	{
@@ -42,8 +40,6 @@ public class AnalyticsAgent : MonoBehaviour {
 
 		if( PlayerPrefs.HasKey( lifetimePrintsString ) )
 			numPrints = PlayerPrefs.GetInt( lifetimePrintsString );
-
-		UnityAnalytics.StartSDK( projectId );
 	}
 
 	public static void LogAnalyticEvent( AnalyticEvent analyticEvent )
@@ -73,12 +69,12 @@ public class AnalyticsAgent : MonoBehaviour {
 					index++;
 				}
 
-				UnityAnalytics.CustomEvent( "printFinished", spritesUsedDictionary );
+				Analytics.CustomEvent( "printFinished", spritesUsedDictionary );
 			} break;
 
 			case AnalyticEvent.UnlockSprite:
 			{
-				UnityAnalytics.CustomEvent( "unlockSprite", new Dictionary<string, object>
+				Analytics.CustomEvent( "unlockSprite", new Dictionary<string, object>
 				{
 					{ "unlockedSprite", SpriteAgent.GetCurrentSprite().name },
 				});
@@ -86,22 +82,22 @@ public class AnalyticsAgent : MonoBehaviour {
 
 			case AnalyticEvent.Share:
 			{
-				UnityAnalytics.CustomEvent( "share", new Dictionary<string, object>{} );
+				Analytics.CustomEvent( "share", new Dictionary<string, object>{} );
 			} break;
 
 			case AnalyticEvent.StoreScreen:
 			{
-				UnityAnalytics.CustomEvent( "storeScreen", new Dictionary<string, object>{} );
+				Analytics.CustomEvent( "storeScreen", new Dictionary<string, object>{} );
 			} break;
 
 			case AnalyticEvent.SettingsScreen:
 			{
-				UnityAnalytics.CustomEvent( "settingsScreen", new Dictionary<string, object>{} );
+				Analytics.CustomEvent( "settingsScreen", new Dictionary<string, object>{} );
 			} break;
 
 			case AnalyticEvent.More:
 			{
-				UnityAnalytics.CustomEvent( "more", new Dictionary<string, object>{} );
+				Analytics.CustomEvent( "more", new Dictionary<string, object>{} );
 			} break;
 		}
 	}
@@ -117,7 +113,7 @@ public class AnalyticsAgent : MonoBehaviour {
 		IOSProductTemplate product = IAPAgent.GetProductById( response.productIdentifier );
 
 		if( product != null )
-			UnityAnalytics.Transaction( response.productIdentifier, decimal.Parse( product.localizedPrice ), product.currencyCode, response.receipt, null );
+			Analytics.Transaction( response.productIdentifier, decimal.Parse( product.localizedPrice ), product.currencyCode, response.receipt, null );
 	}
 
 	public static int GetNumPrints()
