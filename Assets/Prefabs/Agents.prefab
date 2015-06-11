@@ -3194,23 +3194,6 @@ MonoBehaviour:
   - _0001_Truchet2
   - _0002_Truchet3
   - _0003_Original1
-  - _0004_Original3
-  - _0005_Original4
-  - _0006_Original5
-  - _0007_Original6
-  - _0008_Slash
-  - _0009_Slash2
-  - _0010_Original2
-  - _0011_Truchet4
-  - _0012_Truchet5
-  - _0013_Original7
-  - _0014_Original8
-  - _0015_Original9
-  - _0016_original10
-  - _0017_Original11
-  - _0018_Original12
-  - _0019_original13
-  - _0020_original14
   storeSpriteControllers:
   - {fileID: 11482486}
   - {fileID: 11402000}
@@ -6752,7 +6735,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 54bb438ce70714aa0a09d53c03083193, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  version: .0700000003
+  version: .0900000036
   deletePlayerPrefs: 0
 --- !u!114 &11480666
 MonoBehaviour:

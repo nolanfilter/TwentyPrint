@@ -72,7 +72,7 @@ PlayerSettings:
     16:9: 1
     Others: 1
   bundleIdentifier: com.twentypercentgames.twentyprint
-  bundleVersion: 1.08
+  bundleVersion: 1.09
   preloadedAssets: []
   metroEnableIndependentInputSource: 0
   metroEnableLowLatencyPresentationAPI: 0
