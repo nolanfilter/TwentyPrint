@@ -72,11 +72,12 @@ PlayerSettings:
     16:9: 1
     Others: 1
   bundleIdentifier: com.twentypercentgames.twentyprint
-  bundleVersion: 1.09
+  bundleVersion: 1.10
   preloadedAssets: []
   metroEnableIndependentInputSource: 0
   metroEnableLowLatencyPresentationAPI: 0
   xboxOneDisableKinectGpuReservation: 0
+  virtualRealitySupported: 0
   productGUID: c11062cf86ac944d3b1a918966a3b473
   AndroidBundleVersionCode: 1
   AndroidMinSdkVersion: 9
@@ -266,7 +267,6 @@ PlayerSettings:
   psp2InfoBarOnStartup: 0
   psp2InfoBarColor: 0
   psmSplashimage: {fileID: 0}
-  virtualRealitySupported: 0
   spritePackerPolicy: 
   scriptingDefineSymbols: {}
   metroPackageName: TwentyPrint
@@ -398,8 +398,10 @@ PlayerSettings:
   boolPropertyNames:
   - WebGL::analyzeBuildSize
   - WebGL::dataCaching
+  - WebGL::useEmbeddedResources
   WebGL::analyzeBuildSize: 0
   WebGL::dataCaching: 0
+  WebGL::useEmbeddedResources: 0
   stringPropertyNames:
   - WebGL::emscriptenArgs
   - WebGL::template

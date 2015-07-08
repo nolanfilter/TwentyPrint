@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -44,6 +45,12 @@ public class BoardAgent : MonoBehaviour {
 	public GameObject spritePrefab;
 	private SpriteRenderer[ , ] BoardSprites;
 
+	public Text detailText;
+	public TouchDownCallback detailCallback;
+
+	private bool useDetail;
+	private string useDetailString = "useDetail";
+
 	private static BoardAgent mInstance = null;
 	public static BoardAgent instance
 	{
@@ -67,6 +74,26 @@ public class BoardAgent : MonoBehaviour {
 		}
 		
 		mInstance = this;
+
+		if( !PlayerPrefs.HasKey( useDetailString ) )
+			PlayerPrefs.SetInt( useDetailString, 1 );
+		
+		useDetail = ( PlayerPrefs.GetInt( useDetailString ) == 1 );
+		
+		if( detailText )
+			detailText.text = ( useDetail ? "Oleg on" : "Oleg off" );
+	}
+
+	void OnEnable()
+	{
+		if( detailCallback )
+			detailCallback.OnAreaTouch += OnDetailAreaTouch;
+	}
+
+	void OnDisable()
+	{
+		if( detailCallback )
+			detailCallback.OnAreaTouch -= OnDetailAreaTouch;
 	}
 
 	void Start()
@@ -86,6 +113,26 @@ public class BoardAgent : MonoBehaviour {
 				BoardSprites[ i, j ] = MakeSpriteAt( GridToScreenPosition( new Vector2( i, j ) ) );
 
 		ResetBoard();
+	}
+
+	private void OnDetailAreaTouch()
+	{
+		SetUseDetail( !useDetail );
+	}
+
+	public static void SetUseDetail( bool newUseDetail )
+	{
+		if( instance )
+			instance.internalSetUseDetail( newUseDetail );
+	}
+	
+	private void internalSetUseDetail( bool newUseDetail )
+	{
+		useDetail = newUseDetail;
+		PlayerPrefs.SetInt( useDetailString, ( useDetail ? 1 : 0 ) );
+		
+		if( detailText )
+			detailText.text = ( useDetail ? "Oleg on" : "Oleg off" );
 	}
 
 	public static Vector2 GridToScreenPosition( Vector2 gridPosition )
@@ -183,7 +230,11 @@ public class BoardAgent : MonoBehaviour {
 		if( position.x < 0 || position.x >= BoardWidth || position.y < 0 || position.y >= BoardHeight )
 			return;
 
-		BoardSprites[ (int)position.x, (int)position.y ].color = new Color( newColor.r, newColor.g, newColor.b, BoardSprites[ (int)position.x, (int)position.y ].color.a );
+		Color color = new Color( newColor.r, newColor.g, newColor.b, BoardSprites[ (int)position.x, (int)position.y ].color.a );
+
+		BoardSprites[ (int)position.x, (int)position.y ].color = color;
+		BoardSprites[ (int)position.x, (int)position.y ].material.color = color;
+		BoardSprites[ (int)position.x, (int)position.y ].material.SetFloat( "_UseDetail", ( useDetail ? 1f : 0f ) );
 	}
 
 	private SpriteRenderer MakeSpriteAt( Vector2 position )
