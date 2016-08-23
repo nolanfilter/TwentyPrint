@@ -53,7 +53,6 @@ public class AdAgent : MonoBehaviour {
 		if( Advertisement.isSupported )
 		{
 			Advertisement.Initialize( gameID, false );
-			Advertisement.allowPrecache = true;
 		}
 
 		iAdBannerController.instance.addEventListener( iAdEvent.INTERSTITIAL_AD_DID_LOAD, OnInterstitialLoaded );
@@ -103,7 +102,7 @@ public class AdAgent : MonoBehaviour {
 		if( IAPAgent.GetPaidToRemoveAds() )
 			return;
 
-		if( Advertisement.isReady( interstitialVideoZoneId ) )
+        if( Advertisement.IsReady( interstitialVideoZoneId ) )
 		{
 			bool wasAudioOn = AudioAgent.GetIsAudioOn();
 
@@ -111,7 +110,6 @@ public class AdAgent : MonoBehaviour {
 				AudioAgent.SetIsAudioOn( false );
 
 			Advertisement.Show( interstitialVideoZoneId, new ShowOptions {
-				pause = true,
 				resultCallback = result => {
 					switch( result )
 					{
@@ -142,7 +140,7 @@ public class AdAgent : MonoBehaviour {
 		if( IAPAgent.GetPaidToRemoveAds() )
 			return;
 
-		if( Advertisement.isReady( incentivizedVideoZoneId ) )
+		if( Advertisement.IsReady( incentivizedVideoZoneId ) )
 		{
 			bool wasAudioOn = AudioAgent.GetIsAudioOn();
 			
@@ -150,7 +148,6 @@ public class AdAgent : MonoBehaviour {
 				AudioAgent.SetIsAudioOn( false );
 
 			Advertisement.Show( incentivizedVideoZoneId, new ShowOptions {
-				pause = true,
 				resultCallback = result => {
 					switch( result )
 					{
