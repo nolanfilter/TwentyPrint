@@ -17,12 +17,12 @@ public class StoreSpriteController : MonoBehaviour {
 			return;
 		}
 
-		if( background == null )
-		{
-			Debug.LogError( "No background on " + name );
-			enabled = false;
-			return;
-		}
+//		if( background == null )
+//		{
+//			Debug.LogError( "No background on " + name );
+//			enabled = false;
+//			return;
+//		}
 
 		if( outline == null )
 		{
