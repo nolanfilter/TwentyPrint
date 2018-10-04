@@ -21,8 +21,8 @@ public class SpriteAgent : MonoBehaviour {
 
 	private int randomSpriteIndex = -1;
 
-	private float outlineWidth = 2.5f;
-	private float highlightWidth = 10f;
+    private float outlineWidth = 5f;//2.5f;
+    private float highlightWidth = 5f;//10f;
 
 	private bool hasWatchedAd = false;
 

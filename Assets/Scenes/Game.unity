@@ -42,7 +42,7 @@ RenderSettings:
 --- !u!157 &4
 LightmapSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 9
+  serializedVersion: 11
   m_GIWorkflowMode: 1
   m_GISettings:
     serializedVersion: 2
@@ -54,7 +54,7 @@ LightmapSettings:
     m_EnableBakedLightmaps: 1
     m_EnableRealtimeLightmaps: 0
   m_LightmapEditorSettings:
-    serializedVersion: 8
+    serializedVersion: 9
     m_Resolution: 1
     m_BakeResolution: 50
     m_TextureWidth: 1024
@@ -87,7 +87,7 @@ LightmapSettings:
     m_PVRFilteringAtrousNormalSigma: 1
     m_PVRFilteringAtrousPositionSigma: 1
   m_LightingDataAsset: {fileID: 0}
-  m_ShadowMaskMode: 2
+  m_UseShadowmask: 1
 --- !u!196 &5
 NavMeshSettings:
   serializedVersion: 2
@@ -169,52 +169,6 @@ Prefab:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 8c9b814b9bd33413a80f8e1293502c9f, type: 2}
-  m_IsPrefabParent: 0
---- !u!1001 &312678884
-Prefab:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 455338, guid: 005a3bc5084ed416dbccdde1d842328f, type: 2}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 455338, guid: 005a3bc5084ed416dbccdde1d842328f, type: 2}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 455338, guid: 005a3bc5084ed416dbccdde1d842328f, type: 2}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 455338, guid: 005a3bc5084ed416dbccdde1d842328f, type: 2}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 455338, guid: 005a3bc5084ed416dbccdde1d842328f, type: 2}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 455338, guid: 005a3bc5084ed416dbccdde1d842328f, type: 2}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 455338, guid: 005a3bc5084ed416dbccdde1d842328f, type: 2}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 455338, guid: 005a3bc5084ed416dbccdde1d842328f, type: 2}
-      propertyPath: m_RootOrder
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 22385934, guid: 005a3bc5084ed416dbccdde1d842328f, type: 2}
-      propertyPath: m_Camera
-      value: 
-      objectReference: {fileID: 1748917645}
-    m_RemovedComponents: []
-  m_ParentPrefab: {fileID: 100100000, guid: 005a3bc5084ed416dbccdde1d842328f, type: 2}
   m_IsPrefabParent: 0
 --- !u!1 &392153299
 GameObject:
@@ -326,6 +280,52 @@ Prefab:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 96f4356a25e065446a6e8c4500a99fa0, type: 2}
+  m_IsPrefabParent: 0
+--- !u!1001 &1069873715
+Prefab:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 455338, guid: 005a3bc5084ed416dbccdde1d842328f, type: 2}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 455338, guid: 005a3bc5084ed416dbccdde1d842328f, type: 2}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 455338, guid: 005a3bc5084ed416dbccdde1d842328f, type: 2}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 455338, guid: 005a3bc5084ed416dbccdde1d842328f, type: 2}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 455338, guid: 005a3bc5084ed416dbccdde1d842328f, type: 2}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 455338, guid: 005a3bc5084ed416dbccdde1d842328f, type: 2}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 455338, guid: 005a3bc5084ed416dbccdde1d842328f, type: 2}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 455338, guid: 005a3bc5084ed416dbccdde1d842328f, type: 2}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 22385934, guid: 005a3bc5084ed416dbccdde1d842328f, type: 2}
+      propertyPath: m_Camera
+      value: 
+      objectReference: {fileID: 1748917645}
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 100100000, guid: 005a3bc5084ed416dbccdde1d842328f, type: 2}
   m_IsPrefabParent: 0
 --- !u!20 &1748917645 stripped
 Camera:
