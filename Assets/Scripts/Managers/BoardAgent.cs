@@ -115,7 +115,7 @@ public class BoardAgent : MonoBehaviour {
 		ResetBoard();
 	}
 
-	private void OnDetailAreaTouch()
+    private void OnDetailAreaTouch()
 	{
 		SetUseDetail( !useDetail );
 	}
@@ -219,7 +219,7 @@ public class BoardAgent : MonoBehaviour {
 		BoardSprites[ (int)position.x, (int)position.y ].transform.localScale = newScale;
 	}
 
-	public static void SetSpriteColor( Vector2 position, Color newColor )
+    public static void SetSpriteColor( Vector2 position, Color newColor )
 	{
 		if( instance )
 			instance.internalSetSpriteColor( position, newColor );

@@ -1,10 +1,11 @@
-﻿using UnityEngine;
-using UnityEngine.UI;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
 
 public class SpriteAgent : MonoBehaviour {
 
+    public RectTransform highlightSpriteRectTransform;
 	public Sprite[] sprites;
 	public string[] freeSprites;
 	public StoreSpriteController[] storeSpriteControllers;
@@ -22,7 +23,7 @@ public class SpriteAgent : MonoBehaviour {
 	private int randomSpriteIndex = -1;
 
     private float outlineWidth = 5f;//2.5f;
-    private float highlightWidth = 5f;//10f;
+    private float highlightWidth = 10f;//10f;
 
 	private bool hasWatchedAd = false;
 
@@ -68,7 +69,7 @@ public class SpriteAgent : MonoBehaviour {
 				storeSpriteControllers[i].outline.rectTransform.offsetMin = Vector2.one * outlineWidth * -1f;
 				storeSpriteControllers[i].outline.rectTransform.offsetMax = Vector2.one * outlineWidth;
 
-				if( !spritesUnlocked[ spriteName ] )
+                if( !spritesUnlocked[ spriteName ] )
 				{
 					storeSpriteControllers[i].sprite.color = new Color( storeSpriteControllers[i].sprite.color.r, storeSpriteControllers[i].sprite.color.g, storeSpriteControllers[i].sprite.color.b, 0.5f );
 					storeSpriteControllers[i].background.color = new Color( storeSpriteControllers[i].background.color.r, storeSpriteControllers[i].background.color.g, storeSpriteControllers[i].background.color.b, 0.5f );
@@ -87,7 +88,9 @@ public class SpriteAgent : MonoBehaviour {
 			PlayerPrefs.SetInt( spriteIndexString, 0 );
 
 		SetSpriteIndex( PlayerPrefs.GetInt( spriteIndexString ) );
-	}
+
+        UnlockAllSprites();
+    }
 
 	void OnEnable()
 	{
@@ -254,16 +257,25 @@ public class SpriteAgent : MonoBehaviour {
 	private void SetSpriteIndex( int newSpriteIndex )
 	{
         //test
-		storeSpriteControllers[ spriteIndex ].outline.rectTransform.offsetMin = Vector2.one * outlineWidth * -1f;
-		storeSpriteControllers[ spriteIndex ].outline.rectTransform.offsetMax = Vector2.one * outlineWidth;
+        //storeSpriteControllers[ spriteIndex ].outline.rectTransform.offsetMin = Vector2.one * outlineWidth * -1f;
+        //storeSpriteControllers[ spriteIndex ].outline.rectTransform.offsetMax = Vector2.one * outlineWidth;
+        storeSpriteControllers[ spriteIndex ].outline.enabled = true;
 
-		spriteIndex = newSpriteIndex;
+        spriteIndex = newSpriteIndex;
 		PlayerPrefs.SetInt( spriteIndexString, spriteIndex );
+        
+        //storeSpriteControllers[ spriteIndex ].outline.rectTransform.offsetMin = Vector2.one * highlightWidth * -1f;
+        //storeSpriteControllers[ spriteIndex ].outline.rectTransform.offsetMax = Vector2.one * highlightWidth;
 
-		storeSpriteControllers[ spriteIndex ].outline.rectTransform.offsetMin = Vector2.one * highlightWidth * -1f;
-		storeSpriteControllers[ spriteIndex ].outline.rectTransform.offsetMax = Vector2.one * highlightWidth;
+        if( highlightSpriteRectTransform != null )
+        {
+            highlightSpriteRectTransform.anchoredPosition = storeSpriteControllers[ spriteIndex ].GetComponent<RectTransform>().anchoredPosition;
+        }
+
+        storeSpriteControllers[ spriteIndex ].outline.enabled = false;
+
         //end test
-	}
+    }
 
 	private IEnumerator WaitForAdSuccess( int spriteIndexToUnlock )
 	{

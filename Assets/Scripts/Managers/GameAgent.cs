@@ -278,7 +278,7 @@ public class GameAgent : MonoBehaviour {
 
 				case State.Advertising:
 				{
-					if( Application.isEditor && !AdAgent.GetIsShowing() )
+					//if( Application.isEditor && !AdAgent.GetIsShowing() )
 						ChangeState( State.Ready );
 				} break;
 			}
@@ -499,7 +499,7 @@ public class GameAgent : MonoBehaviour {
 			{
 				SetUIEnabled( false );
 				RatingAgent.CheckForPrompt();
-				AdAgent.ShowInterstitialImage();
+				//AdAgent.ShowInterstitialImage();
 			} break;
 		}
 	}

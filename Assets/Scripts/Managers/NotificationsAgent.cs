@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using UnityEngine.iOS;
+//using UnityEngine.iOS;
 using System.Collections;
 
 public class NotificationsAgent : MonoBehaviour {
