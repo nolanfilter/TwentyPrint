@@ -1,0 +1,7 @@
+*.apk
+ios_area
+.idea
+.vs
+*.cache
+JetBrains.meta
+Assets/Plugins/Editor/JetBrains
